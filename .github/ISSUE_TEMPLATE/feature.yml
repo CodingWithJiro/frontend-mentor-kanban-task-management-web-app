@@ -1,0 +1,29 @@
+name: Feature Request
+description: Suggest an improvement or new functionality.
+labels:
+  - enhancement
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What would you like to add or improve?
+      description: Briefly describe the feature or improvement.
+      placeholder: "Example: Allow tasks to be reordered within a column."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Why would this be useful?
+      description: Explain the problem this feature would solve or the benefit it would provide.
+      placeholder: "Example: Users could organize tasks according to their preferred priority."
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context (Optional)
+      description: Add screenshots, examples, sketches, or links that help explain the idea.
