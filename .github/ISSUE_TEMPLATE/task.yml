@@ -1,0 +1,33 @@
+name: Task
+description: Create a task for project development or maintenance.
+labels:
+  - chore
+
+body:
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      description: What needs to be accomplished?
+      placeholder: "Example: Set up the initial Next.js application structure."
+    validations:
+      required: true
+
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Requirements
+      description: List the key requirements or expected outcome.
+      placeholder: |
+        - Use Next.js with TypeScript
+        - Configure Tailwind CSS
+        - Use the App Router
+        - Remove default boilerplate
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context (Optional)
+      description: Add relevant documentation, references, screenshots, or notes.
