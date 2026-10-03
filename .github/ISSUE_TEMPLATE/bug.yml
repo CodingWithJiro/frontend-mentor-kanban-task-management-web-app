@@ -1,0 +1,39 @@
+name: Bug Report
+description: Report something that is not working as expected.
+labels:
+  - bug
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Briefly describe the problem.
+      placeholder: "Example: Clicking the Add New Task button does not open the task modal."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What was the expected behavior?
+      description: Describe what should have happened.
+      placeholder: "Example: The Add New Task button should open the task creation modal."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the steps needed to reproduce the problem.
+      placeholder: |
+        1. Open the board
+        2. Click Add New Task
+        3. Observe the result
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context (Optional)
+      description: Add screenshots, videos, console errors, or anything else that may help.
