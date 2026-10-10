@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { SignJWT } from "jose";
 import { registerSchema } from "../schemas/register.schema.ts";
 import { loginSchema } from "../schemas/login.schema.ts";
+import { JWT_SECRET } from "../config/env.ts";
 
 export async function registerAccount(req: Request, res: Response) {
   const validationResult = registerSchema.safeParse(req.body);
@@ -53,13 +54,12 @@ export async function registerAccount(req: Request, res: Response) {
       },
     });
 
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const token = await new SignJWT({})
       .setProtectedHeader({ alg: "HS256" })
       .setSubject(String(user.id))
       .setIssuedAt()
       .setExpirationTime("1h")
-      .sign(secret);
+      .sign(JWT_SECRET);
 
     return res.status(201).json({
       token,
@@ -119,13 +119,12 @@ export async function loginAccount(req: Request, res: Response) {
     return res.status(401).json({ message: "Invalid credentials." });
   }
 
-  const secret = new TextEncoder().encode(process.env.JWT_SECRET);
   const token = await new SignJWT({})
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(String(user.id))
     .setIssuedAt()
     .setExpirationTime("1h")
-    .sign(secret);
+    .sign(JWT_SECRET);
 
   return res.status(200).json({
     token,
