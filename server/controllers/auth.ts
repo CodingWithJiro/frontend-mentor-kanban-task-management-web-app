@@ -71,7 +71,16 @@ export async function registerAccount(req: Request, res: Response) {
 }
 
 export async function loginAccount(req: Request, res: Response) {
-  const { identifier, password } = req.body;
+  const validationResult = loginSchema.safeParse(req.body);
+  const isInvalid = !validationResult.success;
+  if (isInvalid) {
+    return res.status(400).json({
+      message: "Invalid login credentials.",
+      errors: validationResult.error.issues,
+    });
+  }
+
+  const { identifier, password } = validationResult.data;
 
   const user =
     (await prisma.user.findUnique({
