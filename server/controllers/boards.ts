@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import prisma from "../../src/lib/prisma.ts";
 import { createBoardSchema } from "../schemas/create-board.schema.ts";
+import { updateBoardSchema } from "../schemas/update-board.schema.ts";
 
 export async function getBoards(req: Request, res: Response) {
   const { userId } = req;
@@ -25,7 +26,13 @@ export async function getBoard(req: Request, res: Response) {
       message: "Not authorized.",
     });
   }
-  const boardId = +req.params.id;
+  const boardId = Number(req.params.id);
+  const isInvalidBoardId = !Number.isInteger(boardId) || boardId <= 0;
+  if (isInvalidBoardId) {
+    return res.status(400).json({
+      message: "Invalid board ID.",
+    });
+  }
   const board = await prisma.board.findUnique({
     where: {
       userId,
@@ -81,5 +88,55 @@ export async function createBoard(req: Request, res: Response) {
   return res.status(201).json({
     message: "Board created successfully.",
     board,
+  });
+}
+
+export async function updateBoard(req: Request, res: Response) {
+  const validationResult = updateBoardSchema.safeParse(req.body);
+  const isInvalid = !validationResult.success;
+  if (isInvalid) {
+    return res.status(400).json({
+      message: "Invalid board data.",
+      errors: validationResult.error.issues,
+    });
+  }
+
+  const { userId } = req;
+  if (userId === undefined) {
+    return res.status(401).json({
+      message: "Not authorized.",
+    });
+  }
+
+  const { name } = validationResult.data;
+  const boardId = Number(req.params.id);
+  const isInvalidBoardId = !Number.isInteger(boardId) || boardId <= 0;
+  if (isInvalidBoardId) {
+    return res.status(400).json({
+      message: "Invalid board ID.",
+    });
+  }
+
+  const existingBoard = await prisma.board.findFirst({
+    where: {
+      id: boardId,
+      userId,
+    },
+  });
+
+  if (!existingBoard) {
+    return res.status(404).json({
+      message: "Board not found.",
+    });
+  }
+
+  const updatedBoard = await prisma.board.update({
+    where: { id: boardId },
+    data: { name },
+  });
+
+  return res.status(200).json({
+    message: "Board updated successfully.",
+    board: updatedBoard,
   });
 }
