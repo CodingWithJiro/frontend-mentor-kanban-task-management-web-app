@@ -32,6 +32,11 @@ export async function getBoard(req: Request, res: Response) {
       id: boardId,
     },
   });
+  if (!board) {
+    return res.status(404).json({
+      message: "Board not found.",
+    });
+  }
   return res.status(200).json({
     message: "Board data successfully obtained.",
     board,
