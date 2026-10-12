@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { jwtVerify } from "jose";
+import { JWT_SECRET } from "../config/env.ts";
 
 export async function authenticate(
   req: Request,
@@ -19,10 +20,8 @@ export async function authenticate(
     return res.status(401).json({ message: "Not authorized." });
   }
 
-  const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-
   try {
-    const { payload } = await jwtVerify(token, secret);
+    const { payload } = await jwtVerify(token, JWT_SECRET);
 
     const isMissingId = !payload.sub;
     if (isMissingId) {
