@@ -140,3 +140,42 @@ export async function updateBoard(req: Request, res: Response) {
     board: updatedBoard,
   });
 }
+
+export async function deleteBoard(req: Request, res: Response) {
+  const { userId } = req;
+  if (userId === undefined) {
+    return res.status(401).json({
+      message: "Not authorized.",
+    });
+  }
+
+  const boardId = Number(req.params.id);
+  const isInvalidBoardId = !Number.isInteger(boardId) || boardId <= 0;
+  if (isInvalidBoardId) {
+    return res.status(400).json({
+      message: "Invalid board ID.",
+    });
+  }
+
+  const existingBoard = await prisma.board.findFirst({
+    where: {
+      id: boardId,
+      userId,
+    },
+  });
+  if (!existingBoard) {
+    return res.status(404).json({
+      message: "Board not found.",
+    });
+  }
+
+  await prisma.board.delete({
+    where: {
+      id: boardId,
+    },
+  });
+
+  return res.status(200).json({
+    message: "Board successfully deleted.",
+  });
+}
