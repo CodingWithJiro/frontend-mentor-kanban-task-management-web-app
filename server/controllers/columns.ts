@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import prisma from "../../src/lib/prisma.ts";
+import { createColumnSchema } from "../schemas/create-column.schema.ts";
 
 export async function getColumns(req: Request, res: Response) {
   const { userId } = req;
@@ -85,6 +86,60 @@ export async function getColumn(req: Request, res: Response) {
   }
   return res.status(200).json({
     message: "Column retrieved successfully.",
+    column,
+  });
+}
+
+export async function createColumn(req: Request, res: Response) {
+  const validationResult = createColumnSchema.safeParse(req.body);
+  const isInvalid = !validationResult.success;
+  if (isInvalid) {
+    return res.status(400).json({
+      message: "Invalid column data.",
+      errors: validationResult.error.issues,
+    });
+  }
+  const { name, color } = validationResult.data;
+  const { userId } = req;
+  if (userId === undefined) {
+    return res.status(401).json({
+      message: "Not authorized.",
+    });
+  }
+  const boardId = Number(req.params.boardId);
+  const isInvalidBoardId = !Number.isInteger(boardId) || boardId <= 0;
+  if (isInvalidBoardId) {
+    return res.status(400).json({
+      message: "Invalid board ID.",
+    });
+  }
+  const board = await prisma.board.findFirst({
+    where: {
+      id: boardId,
+      userId,
+    },
+  });
+  if (!board) {
+    return res.status(404).json({
+      message: "Board not found.",
+    });
+  }
+  const lastColumn = await prisma.column.findFirst({
+    where: { boardId },
+    orderBy: { position: "desc" },
+    select: { position: true },
+  });
+  const position = lastColumn ? lastColumn.position + 1 : 1;
+  const column = await prisma.column.create({
+    data: {
+      name,
+      color,
+      position,
+      boardId,
+    },
+  });
+  return res.status(201).json({
+    message: "Column created successfully.",
     column,
   });
 }
