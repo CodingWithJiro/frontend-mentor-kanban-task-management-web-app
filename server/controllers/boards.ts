@@ -12,6 +12,7 @@ export async function getBoards(req: Request, res: Response) {
   }
   const boards = await prisma.board.findMany({
     where: { userId },
+    orderBy: { position: "asc" },
   });
   return res.status(200).json({
     message: "Boards data successfully obtained.",
