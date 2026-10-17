@@ -143,3 +143,56 @@ export async function createColumn(req: Request, res: Response) {
     column,
   });
 }
+
+export async function deleteColumn(req: Request, res: Response) {
+  const { userId } = req;
+  if (userId === undefined) {
+    return res.status(401).json({
+      message: "Not authorized.",
+    });
+  }
+  const boardId = Number(req.params.boardId);
+  const isInvalidBoardId = !Number.isInteger(boardId) || boardId <= 0;
+  if (isInvalidBoardId) {
+    return res.status(400).json({
+      message: "Invalid board ID.",
+    });
+  }
+  const board = await prisma.board.findFirst({
+    where: {
+      id: boardId,
+      userId,
+    },
+  });
+  if (!board) {
+    return res.status(404).json({
+      message: "Board not found.",
+    });
+  }
+  const columnId = Number(req.params.columnId);
+  const isInvalidColumnId = !Number.isInteger(columnId) || columnId <= 0;
+  if (isInvalidColumnId) {
+    return res.status(400).json({
+      message: "Invalid column ID.",
+    });
+  }
+  const existingColumn = await prisma.column.findUnique({
+    where: {
+      id: columnId,
+      boardId,
+    },
+  });
+  if (!existingColumn) {
+    return res.status(404).json({
+      message: "Column not found.",
+    });
+  }
+  await prisma.column.delete({
+    where: {
+      id: columnId,
+    },
+  });
+  return res.status(200).json({
+    message: "Column successfully deleted.",
+  });
+}
