@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import prisma from "../../src/lib/prisma.ts";
+import { createTaskSchema } from "../schemas/create-task.schema.ts";
 
 export async function getTasks(req: Request, res: Response) {
   const { userId } = req;
@@ -124,3 +125,5 @@ export async function getTask(req: Request, res: Response) {
     task,
   });
 }
+
+export async function createTask(req: Request, res: Response) {}
