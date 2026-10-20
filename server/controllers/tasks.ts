@@ -282,3 +282,72 @@ export async function updateTask(req: Request, res: Response) {
     task: updatedTask,
   });
 }
+
+export async function deleteTask(req: Request, res: Response) {
+  const { userId } = req;
+  if (userId === undefined) {
+    return res.status(401).json({
+      message: "Not authorized.",
+    });
+  }
+  const boardId = Number(req.params.boardId);
+  const isInvalidBoardId = !Number.isInteger(boardId) || boardId <= 0;
+  if (isInvalidBoardId) {
+    return res.status(400).json({
+      message: "Invalid board ID.",
+    });
+  }
+  const board = await prisma.board.findFirst({
+    where: {
+      id: boardId,
+      userId,
+    },
+  });
+  if (!board) {
+    return res.status(404).json({
+      message: "Board not found.",
+    });
+  }
+  const columnId = Number(req.params.columnId);
+  const isInvalidColumnId = !Number.isInteger(columnId) || columnId <= 0;
+  if (isInvalidColumnId) {
+    return res.status(400).json({
+      message: "Invalid column ID.",
+    });
+  }
+  const column = await prisma.column.findUnique({
+    where: {
+      id: columnId,
+      boardId,
+    },
+  });
+  if (!column) {
+    return res.status(404).json({
+      message: "Column not found.",
+    });
+  }
+  const taskId = Number(req.params.taskId);
+  const isInvalidTaskId = !Number.isInteger(taskId) || taskId <= 0;
+  if (isInvalidTaskId) {
+    return res.status(400).json({
+      message: "Invalid task ID.",
+    });
+  }
+  const existingTask = await prisma.task.findUnique({
+    where: {
+      id: taskId,
+      columnId,
+    },
+  });
+  if (!existingTask) {
+    return res.status(404).json({
+      message: "Task not found.",
+    });
+  }
+  await prisma.task.delete({
+    where: { id: taskId },
+  });
+  return res.status(200).json({
+    message: "Task successfully deleted.",
+  });
+}
