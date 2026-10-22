@@ -353,3 +353,90 @@ export async function updateSubtask(req: Request, res: Response) {
     subtask: updatedSubtask,
   });
 }
+
+export async function deleteSubtask(req: Request, res: Response) {
+  const { userId } = req;
+  if (userId === undefined) {
+    return res.status(401).json({
+      message: "Not authorized.",
+    });
+  }
+  const boardId = Number(req.params.boardId);
+  const isInvalidBoardId = !Number.isInteger(boardId) || boardId <= 0;
+  if (isInvalidBoardId) {
+    return res.status(400).json({
+      message: "Invalid board ID.",
+    });
+  }
+  const board = await prisma.board.findFirst({
+    where: {
+      id: boardId,
+      userId,
+    },
+  });
+  if (!board) {
+    return res.status(404).json({
+      message: "Board not found.",
+    });
+  }
+  const columnId = Number(req.params.columnId);
+  const isInvalidColumnId = !Number.isInteger(columnId) || columnId <= 0;
+  if (isInvalidColumnId) {
+    return res.status(400).json({
+      message: "Invalid column ID.",
+    });
+  }
+  const column = await prisma.column.findFirst({
+    where: {
+      id: columnId,
+      boardId,
+    },
+  });
+  if (!column) {
+    return res.status(404).json({
+      message: "Column not found.",
+    });
+  }
+  const taskId = Number(req.params.taskId);
+  const isInvalidTaskId = !Number.isInteger(taskId) || taskId <= 0;
+  if (isInvalidTaskId) {
+    return res.status(400).json({
+      message: "Invalid task ID.",
+    });
+  }
+  const task = await prisma.task.findUnique({
+    where: {
+      id: taskId,
+      columnId,
+    },
+  });
+  if (!task) {
+    return res.status(404).json({
+      message: "Task not found.",
+    });
+  }
+  const subtaskId = Number(req.params.subtaskId);
+  const isInvalidSubtaskId = !Number.isInteger(subtaskId) || subtaskId <= 0;
+  if (isInvalidSubtaskId) {
+    return res.status(400).json({
+      message: "Invalid subtask ID.",
+    });
+  }
+  const existingSubtask = await prisma.subtask.findUnique({
+    where: {
+      id: subtaskId,
+      taskId,
+    },
+  });
+  if (!existingSubtask) {
+    return res.status(404).json({
+      message: "Subtask not found.",
+    });
+  }
+  await prisma.subtask.delete({
+    where: { id: subtaskId },
+  });
+  return res.status(200).json({
+    message: "Subtask successfully deleted.",
+  });
+}
