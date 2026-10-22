@@ -1,6 +1,7 @@
 Table users {
   id int [pk, increment]
   name varchar [not null]
+  username varchar [not null]
   email varchar [not null, unique]
   password_hash varchar [not null]
   avatar_url varchar
