@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import prisma from "../../src/lib/prisma.ts";
 import { createSubtaskSchema } from "../schemas/create-subtask.schema.ts";
 import { updateSubtaskSchema } from "../schemas/update-subtask.schema.ts";
+import { isInvalidId } from "../utils/validate-id.ts";
 
 export async function getSubtasks(req: Request, res: Response) {
   const { userId } = req;
@@ -11,8 +12,7 @@ export async function getSubtasks(req: Request, res: Response) {
     });
   }
   const boardId = Number(req.params.boardId);
-  const isInvalidBoardId = !Number.isInteger(boardId) || boardId <= 0;
-  if (isInvalidBoardId) {
+  if (isInvalidId(boardId)) {
     return res.status(400).json({
       message: "Invalid board ID.",
     });
@@ -29,8 +29,7 @@ export async function getSubtasks(req: Request, res: Response) {
     });
   }
   const columnId = Number(req.params.columnId);
-  const isInvalidColumnId = !Number.isInteger(columnId) || columnId <= 0;
-  if (isInvalidColumnId) {
+  if (isInvalidId(columnId)) {
     return res.status(400).json({
       message: "Invalid column ID.",
     });
@@ -47,8 +46,7 @@ export async function getSubtasks(req: Request, res: Response) {
     });
   }
   const taskId = Number(req.params.taskId);
-  const isInvalidTaskId = !Number.isInteger(taskId) || taskId <= 0;
-  if (isInvalidTaskId) {
+  if (isInvalidId(taskId)) {
     return res.status(400).json({
       message: "Invalid task ID.",
     });
@@ -86,8 +84,7 @@ export async function getSubtask(req: Request, res: Response) {
     });
   }
   const boardId = Number(req.params.boardId);
-  const isInvalidBoardId = !Number.isInteger(boardId) || boardId <= 0;
-  if (isInvalidBoardId) {
+  if (isInvalidId(boardId)) {
     return res.status(400).json({
       message: "Invalid board ID.",
     });
@@ -104,8 +101,7 @@ export async function getSubtask(req: Request, res: Response) {
     });
   }
   const columnId = Number(req.params.columnId);
-  const isInvalidColumnId = !Number.isInteger(columnId) || columnId <= 0;
-  if (isInvalidColumnId) {
+  if (isInvalidId(columnId)) {
     return res.status(400).json({
       message: "Invalid column ID.",
     });
@@ -122,8 +118,7 @@ export async function getSubtask(req: Request, res: Response) {
     });
   }
   const taskId = Number(req.params.taskId);
-  const isInvalidTaskId = !Number.isInteger(taskId) || taskId <= 0;
-  if (isInvalidTaskId) {
+  if (isInvalidId(taskId)) {
     return res.status(400).json({
       message: "Invalid task ID.",
     });
@@ -140,8 +135,7 @@ export async function getSubtask(req: Request, res: Response) {
     });
   }
   const subtaskId = Number(req.params.subtaskId);
-  const isInvalidSubtaskId = !Number.isInteger(subtaskId) || subtaskId <= 0;
-  if (isInvalidSubtaskId) {
+  if (isInvalidId(subtaskId)) {
     return res.status(400).json({
       message: "Invalid subtask ID.",
     });
@@ -180,8 +174,7 @@ export async function createSubtask(req: Request, res: Response) {
     });
   }
   const boardId = Number(req.params.boardId);
-  const isInvalidBoardId = !Number.isInteger(boardId) || boardId <= 0;
-  if (isInvalidBoardId) {
+  if (isInvalidId(boardId)) {
     return res.status(400).json({
       message: "Invalid board ID.",
     });
@@ -198,8 +191,7 @@ export async function createSubtask(req: Request, res: Response) {
     });
   }
   const columnId = Number(req.params.columnId);
-  const isInvalidColumnId = !Number.isInteger(columnId) || columnId <= 0;
-  if (isInvalidColumnId) {
+  if (isInvalidId(columnId)) {
     return res.status(400).json({
       message: "Invalid column ID.",
     });
@@ -216,8 +208,7 @@ export async function createSubtask(req: Request, res: Response) {
     });
   }
   const taskId = Number(req.params.taskId);
-  const isInvalidTaskId = !Number.isInteger(taskId) || taskId <= 0;
-  if (isInvalidTaskId) {
+  if (isInvalidId(taskId)) {
     return res.status(400).json({
       message: "Invalid task ID.",
     });
@@ -270,8 +261,7 @@ export async function updateSubtask(req: Request, res: Response) {
     });
   }
   const boardId = Number(req.params.boardId);
-  const isInvalidBoardId = !Number.isInteger(boardId) || boardId <= 0;
-  if (isInvalidBoardId) {
+  if (isInvalidId(boardId)) {
     return res.status(400).json({
       message: "Invalid board ID.",
     });
@@ -288,8 +278,7 @@ export async function updateSubtask(req: Request, res: Response) {
     });
   }
   const columnId = Number(req.params.columnId);
-  const isInvalidColumnId = !Number.isInteger(columnId) || columnId <= 0;
-  if (isInvalidColumnId) {
+  if (isInvalidId(columnId)) {
     return res.status(400).json({
       message: "Invalid column ID.",
     });
@@ -306,8 +295,7 @@ export async function updateSubtask(req: Request, res: Response) {
     });
   }
   const taskId = Number(req.params.taskId);
-  const isInvalidTaskId = !Number.isInteger(taskId) || taskId <= 0;
-  if (isInvalidTaskId) {
+  if (isInvalidId(taskId)) {
     return res.status(400).json({
       message: "Invalid task ID.",
     });
@@ -324,8 +312,7 @@ export async function updateSubtask(req: Request, res: Response) {
     });
   }
   const subtaskId = Number(req.params.subtaskId);
-  const isInvalidSubtaskId = !Number.isInteger(subtaskId) || subtaskId <= 0;
-  if (isInvalidSubtaskId) {
+  if (isInvalidId(subtaskId)) {
     return res.status(400).json({
       message: "Invalid subtask ID.",
     });
@@ -362,8 +349,7 @@ export async function deleteSubtask(req: Request, res: Response) {
     });
   }
   const boardId = Number(req.params.boardId);
-  const isInvalidBoardId = !Number.isInteger(boardId) || boardId <= 0;
-  if (isInvalidBoardId) {
+  if (isInvalidId(boardId)) {
     return res.status(400).json({
       message: "Invalid board ID.",
     });
@@ -380,8 +366,7 @@ export async function deleteSubtask(req: Request, res: Response) {
     });
   }
   const columnId = Number(req.params.columnId);
-  const isInvalidColumnId = !Number.isInteger(columnId) || columnId <= 0;
-  if (isInvalidColumnId) {
+  if (isInvalidId(columnId)) {
     return res.status(400).json({
       message: "Invalid column ID.",
     });
@@ -398,8 +383,7 @@ export async function deleteSubtask(req: Request, res: Response) {
     });
   }
   const taskId = Number(req.params.taskId);
-  const isInvalidTaskId = !Number.isInteger(taskId) || taskId <= 0;
-  if (isInvalidTaskId) {
+  if (isInvalidId(taskId)) {
     return res.status(400).json({
       message: "Invalid task ID.",
     });
@@ -416,8 +400,7 @@ export async function deleteSubtask(req: Request, res: Response) {
     });
   }
   const subtaskId = Number(req.params.subtaskId);
-  const isInvalidSubtaskId = !Number.isInteger(subtaskId) || subtaskId <= 0;
-  if (isInvalidSubtaskId) {
+  if (isInvalidId(subtaskId)) {
     return res.status(400).json({
       message: "Invalid subtask ID.",
     });
