@@ -3,6 +3,12 @@ import prisma from "../../src/lib/prisma.ts";
 import { createSubtaskSchema } from "../schemas/create-subtask.schema.ts";
 import { updateSubtaskSchema } from "../schemas/update-subtask.schema.ts";
 import { isInvalidId } from "../utils/validate-id.ts";
+import {
+  getBoardColumn,
+  getUserBoard,
+  getColumnTask,
+  getTaskSubtask,
+} from "../services/resource-access.service.ts";
 
 export async function getSubtasks(req: Request, res: Response) {
   const { userId } = req;
@@ -17,12 +23,7 @@ export async function getSubtasks(req: Request, res: Response) {
       message: "Invalid board ID.",
     });
   }
-  const board = await prisma.board.findFirst({
-    where: {
-      id: boardId,
-      userId,
-    },
-  });
+  const board = await getUserBoard(userId, boardId);
   if (!board) {
     return res.status(404).json({
       message: "Board not found.",
@@ -34,12 +35,7 @@ export async function getSubtasks(req: Request, res: Response) {
       message: "Invalid column ID.",
     });
   }
-  const column = await prisma.column.findUnique({
-    where: {
-      id: columnId,
-      boardId,
-    },
-  });
+  const column = await getBoardColumn(boardId, columnId);
   if (!column) {
     return res.status(404).json({
       message: "Column not found.",
@@ -51,12 +47,7 @@ export async function getSubtasks(req: Request, res: Response) {
       message: "Invalid task ID.",
     });
   }
-  const task = await prisma.task.findUnique({
-    where: {
-      id: taskId,
-      columnId,
-    },
-  });
+  const task = await getColumnTask(columnId, taskId);
   if (!task) {
     return res.status(404).json({
       message: "Task not found.",
@@ -89,12 +80,7 @@ export async function getSubtask(req: Request, res: Response) {
       message: "Invalid board ID.",
     });
   }
-  const board = await prisma.board.findFirst({
-    where: {
-      id: boardId,
-      userId,
-    },
-  });
+  const board = await getUserBoard(userId, boardId);
   if (!board) {
     return res.status(404).json({
       message: "Board not found.",
@@ -106,12 +92,7 @@ export async function getSubtask(req: Request, res: Response) {
       message: "Invalid column ID.",
     });
   }
-  const column = await prisma.column.findUnique({
-    where: {
-      id: columnId,
-      boardId,
-    },
-  });
+  const column = await getBoardColumn(boardId, columnId);
   if (!column) {
     return res.status(404).json({
       message: "Column not found.",
@@ -123,12 +104,7 @@ export async function getSubtask(req: Request, res: Response) {
       message: "Invalid task ID.",
     });
   }
-  const task = await prisma.task.findUnique({
-    where: {
-      id: taskId,
-      columnId,
-    },
-  });
+  const task = await getColumnTask(columnId, taskId);
   if (!task) {
     return res.status(404).json({
       message: "Task not found.",
@@ -140,12 +116,7 @@ export async function getSubtask(req: Request, res: Response) {
       message: "Invalid subtask ID.",
     });
   }
-  const subtask = await prisma.subtask.findUnique({
-    where: {
-      id: subtaskId,
-      taskId,
-    },
-  });
+  const subtask = await getTaskSubtask(taskId, subtaskId);
   if (!subtask) {
     return res.status(404).json({
       message: "Subtask not found.",
@@ -179,12 +150,7 @@ export async function createSubtask(req: Request, res: Response) {
       message: "Invalid board ID.",
     });
   }
-  const board = await prisma.board.findFirst({
-    where: {
-      id: boardId,
-      userId,
-    },
-  });
+  const board = await getUserBoard(userId, boardId);
   if (!board) {
     return res.status(404).json({
       message: "Board not found.",
@@ -196,12 +162,7 @@ export async function createSubtask(req: Request, res: Response) {
       message: "Invalid column ID.",
     });
   }
-  const column = await prisma.column.findFirst({
-    where: {
-      id: columnId,
-      boardId,
-    },
-  });
+  const column = await getBoardColumn(boardId, columnId);
   if (!column) {
     return res.status(404).json({
       message: "Column not found.",
@@ -213,12 +174,7 @@ export async function createSubtask(req: Request, res: Response) {
       message: "Invalid task ID.",
     });
   }
-  const task = await prisma.task.findUnique({
-    where: {
-      id: taskId,
-      columnId,
-    },
-  });
+  const task = await getColumnTask(columnId, taskId);
   if (!task) {
     return res.status(404).json({
       message: "Task not found.",
@@ -266,12 +222,7 @@ export async function updateSubtask(req: Request, res: Response) {
       message: "Invalid board ID.",
     });
   }
-  const board = await prisma.board.findFirst({
-    where: {
-      id: boardId,
-      userId,
-    },
-  });
+  const board = await getUserBoard(userId, boardId);
   if (!board) {
     return res.status(404).json({
       message: "Board not found.",
@@ -283,12 +234,7 @@ export async function updateSubtask(req: Request, res: Response) {
       message: "Invalid column ID.",
     });
   }
-  const column = await prisma.column.findFirst({
-    where: {
-      id: columnId,
-      boardId,
-    },
-  });
+  const column = await getBoardColumn(boardId, columnId);
   if (!column) {
     return res.status(404).json({
       message: "Column not found.",
@@ -300,12 +246,7 @@ export async function updateSubtask(req: Request, res: Response) {
       message: "Invalid task ID.",
     });
   }
-  const task = await prisma.task.findUnique({
-    where: {
-      id: taskId,
-      columnId,
-    },
-  });
+  const task = await getColumnTask(columnId, taskId);
   if (!task) {
     return res.status(404).json({
       message: "Task not found.",
@@ -317,12 +258,7 @@ export async function updateSubtask(req: Request, res: Response) {
       message: "Invalid subtask ID.",
     });
   }
-  const subtask = await prisma.subtask.findUnique({
-    where: {
-      id: subtaskId,
-      taskId,
-    },
-  });
+  const subtask = await getTaskSubtask(taskId, subtaskId);
   if (!subtask) {
     return res.status(404).json({
       message: "Subtask not found.",
@@ -354,12 +290,7 @@ export async function deleteSubtask(req: Request, res: Response) {
       message: "Invalid board ID.",
     });
   }
-  const board = await prisma.board.findFirst({
-    where: {
-      id: boardId,
-      userId,
-    },
-  });
+  const board = await getUserBoard(userId, boardId);
   if (!board) {
     return res.status(404).json({
       message: "Board not found.",
@@ -371,12 +302,7 @@ export async function deleteSubtask(req: Request, res: Response) {
       message: "Invalid column ID.",
     });
   }
-  const column = await prisma.column.findFirst({
-    where: {
-      id: columnId,
-      boardId,
-    },
-  });
+  const column = await getBoardColumn(boardId, columnId);
   if (!column) {
     return res.status(404).json({
       message: "Column not found.",
@@ -388,12 +314,7 @@ export async function deleteSubtask(req: Request, res: Response) {
       message: "Invalid task ID.",
     });
   }
-  const task = await prisma.task.findUnique({
-    where: {
-      id: taskId,
-      columnId,
-    },
-  });
+  const task = await getColumnTask(columnId, taskId);
   if (!task) {
     return res.status(404).json({
       message: "Task not found.",
@@ -405,12 +326,7 @@ export async function deleteSubtask(req: Request, res: Response) {
       message: "Invalid subtask ID.",
     });
   }
-  const existingSubtask = await prisma.subtask.findUnique({
-    where: {
-      id: subtaskId,
-      taskId,
-    },
-  });
+  const existingSubtask = await getTaskSubtask(taskId, subtaskId);
   if (!existingSubtask) {
     return res.status(404).json({
       message: "Subtask not found.",
