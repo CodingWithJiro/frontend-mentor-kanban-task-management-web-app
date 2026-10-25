@@ -2,6 +2,8 @@ import type { Request, Response } from "express";
 import prisma from "../../src/lib/prisma.ts";
 import { createBoardSchema } from "../schemas/create-board.schema.ts";
 import { updateBoardSchema } from "../schemas/update-board.schema.ts";
+import { isInvalidId } from "../utils/validate-id.ts";
+import { getUserBoard } from "../services/resource-access.service.ts";
 
 export async function getBoards(req: Request, res: Response) {
   const { userId } = req;
@@ -12,6 +14,7 @@ export async function getBoards(req: Request, res: Response) {
   }
   const boards = await prisma.board.findMany({
     where: { userId },
+    orderBy: { position: "asc" },
   });
   return res.status(200).json({
     message: "Boards data successfully obtained.",
@@ -27,18 +30,12 @@ export async function getBoard(req: Request, res: Response) {
     });
   }
   const boardId = Number(req.params.id);
-  const isInvalidBoardId = !Number.isInteger(boardId) || boardId <= 0;
-  if (isInvalidBoardId) {
+  if (isInvalidId(boardId)) {
     return res.status(400).json({
       message: "Invalid board ID.",
     });
   }
-  const board = await prisma.board.findUnique({
-    where: {
-      userId,
-      id: boardId,
-    },
-  });
+  const board = await getUserBoard(userId, boardId);
   if (!board) {
     return res.status(404).json({
       message: "Board not found.",
@@ -51,6 +48,12 @@ export async function getBoard(req: Request, res: Response) {
 }
 
 export async function createBoard(req: Request, res: Response) {
+  const { userId } = req;
+  if (userId === undefined) {
+    return res.status(401).json({
+      message: "Not authorized.",
+    });
+  }
   const validationResult = createBoardSchema.safeParse(req.body);
   const isInvalid = !validationResult.success;
   if (isInvalid) {
@@ -59,24 +62,13 @@ export async function createBoard(req: Request, res: Response) {
       errors: validationResult.error.issues,
     });
   }
-
   const { name } = validationResult.data;
-  const { userId } = req;
-
-  if (userId === undefined) {
-    return res.status(401).json({
-      message: "Not authorized.",
-    });
-  }
-
   const lastBoard = await prisma.board.findFirst({
     where: { userId },
     orderBy: { position: "desc" },
     select: { position: true },
   });
-
   const position = lastBoard ? lastBoard.position + 1 : 1;
-
   const board = await prisma.board.create({
     data: {
       name,
@@ -84,7 +76,6 @@ export async function createBoard(req: Request, res: Response) {
       userId,
     },
   });
-
   return res.status(201).json({
     message: "Board created successfully.",
     board,
@@ -92,6 +83,12 @@ export async function createBoard(req: Request, res: Response) {
 }
 
 export async function updateBoard(req: Request, res: Response) {
+  const { userId } = req;
+  if (userId === undefined) {
+    return res.status(401).json({
+      message: "Not authorized.",
+    });
+  }
   const validationResult = updateBoardSchema.safeParse(req.body);
   const isInvalid = !validationResult.success;
   if (isInvalid) {
@@ -100,41 +97,23 @@ export async function updateBoard(req: Request, res: Response) {
       errors: validationResult.error.issues,
     });
   }
-
-  const { userId } = req;
-  if (userId === undefined) {
-    return res.status(401).json({
-      message: "Not authorized.",
-    });
-  }
-
   const { name } = validationResult.data;
   const boardId = Number(req.params.id);
-  const isInvalidBoardId = !Number.isInteger(boardId) || boardId <= 0;
-  if (isInvalidBoardId) {
+  if (isInvalidId(boardId)) {
     return res.status(400).json({
       message: "Invalid board ID.",
     });
   }
-
-  const existingBoard = await prisma.board.findFirst({
-    where: {
-      id: boardId,
-      userId,
-    },
-  });
-
+  const existingBoard = await getUserBoard(userId, boardId);
   if (!existingBoard) {
     return res.status(404).json({
       message: "Board not found.",
     });
   }
-
   const updatedBoard = await prisma.board.update({
     where: { id: boardId },
     data: { name },
   });
-
   return res.status(200).json({
     message: "Board updated successfully.",
     board: updatedBoard,
@@ -148,33 +127,23 @@ export async function deleteBoard(req: Request, res: Response) {
       message: "Not authorized.",
     });
   }
-
   const boardId = Number(req.params.id);
-  const isInvalidBoardId = !Number.isInteger(boardId) || boardId <= 0;
-  if (isInvalidBoardId) {
+  if (isInvalidId(boardId)) {
     return res.status(400).json({
       message: "Invalid board ID.",
     });
   }
-
-  const existingBoard = await prisma.board.findFirst({
-    where: {
-      id: boardId,
-      userId,
-    },
-  });
+  const existingBoard = await getUserBoard(userId, boardId);
   if (!existingBoard) {
     return res.status(404).json({
       message: "Board not found.",
     });
   }
-
   await prisma.board.delete({
     where: {
       id: boardId,
     },
   });
-
   return res.status(200).json({
     message: "Board successfully deleted.",
   });
