@@ -8,7 +8,7 @@ export const envSchema = z.object({
       /^[0-9a-f]{64}$/i,
       "JWT_SECRET must be 32 random bytes encoded as hex",
     ),
-  REFRESH_TOKENS_EXPIRES_IN: z
+  REFRESH_TOKEN_EXPIRES_IN: z
     .string()
     .regex(/^\d+\s*(s|m|h|d|w|y)$/i, "Invalid refresh token expiration format")
     .default("7d"),
