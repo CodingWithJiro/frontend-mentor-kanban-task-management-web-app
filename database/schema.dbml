@@ -9,6 +9,17 @@ Table users {
   updated_at timestamp [not null, default: `now()`]
 }
 
+Table refresh_tokens {
+  id int [pk, increment]
+  token_hash varchar [not null, unique]
+  user_id int [not null]
+  expires_at timestamp [not null]
+  revoked_at timestamp [not null]
+  created_at timestamp [not null, default: `now()`]
+}
+
+Ref: refresh_tokens.user_id > users.id [delete: cascade]
+
 Table boards {
   id int [pk, increment]
   name varchar [not null]
