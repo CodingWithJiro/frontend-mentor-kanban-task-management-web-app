@@ -1,10 +1,13 @@
 import type { Request, Response } from "express";
+import type { StringValue } from "ms";
 import prisma from "../../src/lib/prisma.ts";
 import bcrypt from "bcryptjs";
+import ms from "ms";
 import { SignJWT } from "jose";
 import { registerSchema } from "../schemas/register.schema.ts";
 import { loginSchema } from "../schemas/login.schema.ts";
-import { JWT_SECRET } from "../config/env.ts";
+import { JWT_SECRET, REFRESH_TOKEN_EXPIRES_IN } from "../config/env.ts";
+import { createHash, randomBytes } from "node:crypto";
 
 export async function registerAccount(req: Request, res: Response) {
   const validationResult = registerSchema.safeParse(req.body);
@@ -15,9 +18,7 @@ export async function registerAccount(req: Request, res: Response) {
       errors: validationResult.error.issues,
     });
   }
-
   const { name, username, email, password } = validationResult.data;
-
   const existingUser = await prisma.user.findFirst({
     where: {
       OR: [{ username }, { email }],
@@ -27,40 +28,56 @@ export async function registerAccount(req: Request, res: Response) {
       email: true,
     },
   });
-
   const isUsernameAlreadyInUse = existingUser?.username === username;
   if (isUsernameAlreadyInUse) {
     return res.status(409).json({
       message: "Username is already in use.",
     });
   }
-
   const isEmailAlreadyInUse = existingUser?.email === email;
   if (isEmailAlreadyInUse) {
     return res.status(409).json({
       message: "Email is already in use.",
     });
   }
-
   const passwordHash = await bcrypt.hash(password, 12);
-
+  const refreshToken = randomBytes(32).toString("hex");
+  const refreshTokenHash = createHash("sha256")
+    .update(refreshToken)
+    .digest("hex");
+  const refreshTokenLifetimeMs = ms(REFRESH_TOKEN_EXPIRES_IN as StringValue);
   try {
-    const user = await prisma.user.create({
-      data: {
-        name,
-        username,
-        email,
-        passwordHash,
-      },
+    const user = await prisma.$transaction(async (tx) => {
+      const newUser = await tx.user.create({
+        data: {
+          name,
+          username,
+          email,
+          passwordHash,
+        },
+      });
+      await tx.refreshToken.create({
+        data: {
+          tokenHash: refreshTokenHash,
+          userId: user.id,
+          expiresAt: new Date(Date.now() + refreshTokenLifetimeMs),
+        },
+      });
+      return newUser;
     });
-
     const token = await new SignJWT({})
       .setProtectedHeader({ alg: "HS256" })
       .setSubject(String(user.id))
       .setIssuedAt()
       .setExpirationTime("1h")
       .sign(JWT_SECRET);
-
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/api/auth",
+      maxAge: refreshTokenLifetimeMs,
+    });
     return res.status(201).json({
       token,
       user: {
