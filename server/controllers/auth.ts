@@ -112,9 +112,7 @@ export async function loginAccount(req: Request, res: Response) {
       errors: validationResult.error.issues,
     });
   }
-
   const { identifier, password } = validationResult.data;
-
   const user =
     (await prisma.user.findUnique({
       where: { email: identifier },
@@ -122,12 +120,10 @@ export async function loginAccount(req: Request, res: Response) {
     (await prisma.user.findUnique({
       where: { username: identifier },
     }));
-
   const isMissingUser = !user;
   if (isMissingUser) {
     return res.status(401).json({ message: "Invalid credentials." });
   }
-
   const isInvalidPassword = !(await bcrypt.compare(
     password,
     user.passwordHash,
@@ -135,14 +131,31 @@ export async function loginAccount(req: Request, res: Response) {
   if (isInvalidPassword) {
     return res.status(401).json({ message: "Invalid credentials." });
   }
-
+  const refreshToken = randomBytes(32).toString("hex");
+  const refreshTokenHash = createHash("sha256")
+    .update(refreshToken)
+    .digest("hex");
+  const refreshTokenLifetimeMs = ms(REFRESH_TOKEN_EXPIRES_IN as StringValue);
   const token = await new SignJWT({})
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(String(user.id))
     .setIssuedAt()
     .setExpirationTime("1h")
     .sign(JWT_SECRET);
-
+  await prisma.refreshToken.create({
+    data: {
+      tokenHash: refreshTokenHash,
+      userId: user.id,
+      expiresAt: new Date(Date.now() + refreshTokenLifetimeMs),
+    },
+  });
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/api/auth",
+    maxAge: refreshTokenLifetimeMs,
+  });
   return res.status(200).json({
     token,
     user: {
@@ -153,3 +166,6 @@ export async function loginAccount(req: Request, res: Response) {
     },
   });
 }
+
+// TODO: UPDATE THE LOGIN ACCOUNT BY ADDING REFRESH TOKENS
+// TODO: ASK ABOUT IF WE SEND THESE TOKENS TO COOKIES, WHAT AND HOW DOES THE SERER KNOW TO USE THESE TOKENS WHEN THE ORIGINAL JWT ACCESS TOKENS EXPIRE
