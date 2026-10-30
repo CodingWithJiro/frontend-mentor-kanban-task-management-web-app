@@ -1,15 +1,14 @@
 import type { Request, Response } from "express";
-import prisma from "../../src/lib/prisma.ts";
 import bcrypt from "bcryptjs";
-import { SignJWT } from "jose";
+import prisma from "../../src/lib/prisma.ts";
 import { registerSchema } from "../schemas/register.schema.ts";
 import { loginSchema } from "../schemas/login.schema.ts";
-import { JWT_SECRET } from "../config/env.ts";
 import {
   getRefreshToken,
   getRefreshTokenMaxAge,
   saveRefreshToken,
 } from "../services/refresh-token.service.ts";
+import { generateAccessToken } from "../services/access-token.service.ts";
 
 export async function registerAccount(req: Request, res: Response) {
   const validationResult = registerSchema.safeParse(req.body);
@@ -63,12 +62,6 @@ export async function registerAccount(req: Request, res: Response) {
       );
       return newUser;
     });
-    const token = await new SignJWT({})
-      .setProtectedHeader({ alg: "HS256" })
-      .setSubject(String(user.id))
-      .setIssuedAt()
-      .setExpirationTime("1h")
-      .sign(JWT_SECRET);
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -77,7 +70,7 @@ export async function registerAccount(req: Request, res: Response) {
       maxAge: refreshTokenMaxAge,
     });
     return res.status(201).json({
-      token,
+      accessToken: await generateAccessToken(user.id),
       user: {
         id: user.id,
         name: user.name,
@@ -131,12 +124,6 @@ export async function loginAccount(req: Request, res: Response) {
   }
   const refreshToken = getRefreshToken();
   const refreshTokenMaxAge = getRefreshTokenMaxAge();
-  const token = await new SignJWT({})
-    .setProtectedHeader({ alg: "HS256" })
-    .setSubject(String(user.id))
-    .setIssuedAt()
-    .setExpirationTime("1h")
-    .sign(JWT_SECRET);
   await saveRefreshToken(
     prisma,
     refreshToken,
@@ -151,7 +138,7 @@ export async function loginAccount(req: Request, res: Response) {
     maxAge: refreshTokenMaxAge,
   });
   return res.status(200).json({
-    token,
+    accessToken: await generateAccessToken(user.id),
     user: {
       id: user.id,
       name: user.name,
