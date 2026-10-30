@@ -9,6 +9,7 @@ import {
   saveRefreshToken,
 } from "../services/refresh-token.service.ts";
 import { generateAccessToken } from "../services/access-token.service.ts";
+import { setRefreshTokenCookie } from "../utils/cookies.ts";
 
 export async function registerAccount(req: Request, res: Response) {
   const validationResult = registerSchema.safeParse(req.body);
@@ -62,15 +63,10 @@ export async function registerAccount(req: Request, res: Response) {
       );
       return newUser;
     });
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/api/auth",
-      maxAge: refreshTokenMaxAge,
-    });
+    const accessToken = await generateAccessToken(user.id);
+    setRefreshTokenCookie(res, refreshToken, refreshTokenMaxAge);
     return res.status(201).json({
-      accessToken: await generateAccessToken(user.id),
+      accessToken,
       user: {
         id: user.id,
         name: user.name,
@@ -130,15 +126,10 @@ export async function loginAccount(req: Request, res: Response) {
     user.id,
     new Date(Date.now() + refreshTokenMaxAge),
   );
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/api/auth",
-    maxAge: refreshTokenMaxAge,
-  });
+  const accessToken = await generateAccessToken(user.id);
+  setRefreshTokenCookie(res, refreshToken, refreshTokenMaxAge);
   return res.status(200).json({
-    accessToken: await generateAccessToken(user.id),
+    accessToken,
     user: {
       id: user.id,
       name: user.name,
