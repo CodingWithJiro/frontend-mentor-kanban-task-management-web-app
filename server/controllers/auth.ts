@@ -1,13 +1,15 @@
 import type { Request, Response } from "express";
-import type { StringValue } from "ms";
 import prisma from "../../src/lib/prisma.ts";
 import bcrypt from "bcryptjs";
-import ms from "ms";
 import { SignJWT } from "jose";
 import { registerSchema } from "../schemas/register.schema.ts";
 import { loginSchema } from "../schemas/login.schema.ts";
-import { JWT_SECRET, REFRESH_TOKEN_EXPIRES_IN } from "../config/env.ts";
-import { createHash, randomBytes } from "node:crypto";
+import { JWT_SECRET } from "../config/env.ts";
+import {
+  getRefreshToken,
+  getRefreshTokenMaxAge,
+  saveRefreshToken,
+} from "../services/refresh-token.service.ts";
 
 export async function registerAccount(req: Request, res: Response) {
   const validationResult = registerSchema.safeParse(req.body);
@@ -41,11 +43,8 @@ export async function registerAccount(req: Request, res: Response) {
     });
   }
   const passwordHash = await bcrypt.hash(password, 12);
-  const refreshToken = randomBytes(32).toString("hex");
-  const refreshTokenHash = createHash("sha256")
-    .update(refreshToken)
-    .digest("hex");
-  const refreshTokenLifetimeMs = ms(REFRESH_TOKEN_EXPIRES_IN as StringValue);
+  const refreshToken = getRefreshToken();
+  const refreshTokenMaxAge = getRefreshTokenMaxAge();
   try {
     const user = await prisma.$transaction(async (tx) => {
       const newUser = await tx.user.create({
@@ -56,13 +55,12 @@ export async function registerAccount(req: Request, res: Response) {
           passwordHash,
         },
       });
-      await tx.refreshToken.create({
-        data: {
-          tokenHash: refreshTokenHash,
-          userId: user.id,
-          expiresAt: new Date(Date.now() + refreshTokenLifetimeMs),
-        },
-      });
+      await saveRefreshToken(
+        tx,
+        refreshToken,
+        newUser.id,
+        new Date(Date.now() + refreshTokenMaxAge),
+      );
       return newUser;
     });
     const token = await new SignJWT({})
@@ -76,7 +74,7 @@ export async function registerAccount(req: Request, res: Response) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/api/auth",
-      maxAge: refreshTokenLifetimeMs,
+      maxAge: refreshTokenMaxAge,
     });
     return res.status(201).json({
       token,
@@ -131,30 +129,26 @@ export async function loginAccount(req: Request, res: Response) {
   if (isInvalidPassword) {
     return res.status(401).json({ message: "Invalid credentials." });
   }
-  const refreshToken = randomBytes(32).toString("hex");
-  const refreshTokenHash = createHash("sha256")
-    .update(refreshToken)
-    .digest("hex");
-  const refreshTokenLifetimeMs = ms(REFRESH_TOKEN_EXPIRES_IN as StringValue);
+  const refreshToken = getRefreshToken();
+  const refreshTokenMaxAge = getRefreshTokenMaxAge();
   const token = await new SignJWT({})
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(String(user.id))
     .setIssuedAt()
     .setExpirationTime("1h")
     .sign(JWT_SECRET);
-  await prisma.refreshToken.create({
-    data: {
-      tokenHash: refreshTokenHash,
-      userId: user.id,
-      expiresAt: new Date(Date.now() + refreshTokenLifetimeMs),
-    },
-  });
+  await saveRefreshToken(
+    prisma,
+    refreshToken,
+    user.id,
+    new Date(Date.now() + refreshTokenMaxAge),
+  );
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/api/auth",
-    maxAge: refreshTokenLifetimeMs,
+    maxAge: refreshTokenMaxAge,
   });
   return res.status(200).json({
     token,
@@ -166,6 +160,3 @@ export async function loginAccount(req: Request, res: Response) {
     },
   });
 }
-
-// TODO: UPDATE THE LOGIN ACCOUNT BY ADDING REFRESH TOKENS
-// TODO: ASK ABOUT IF WE SEND THESE TOKENS TO COOKIES, WHAT AND HOW DOES THE SERER KNOW TO USE THESE TOKENS WHEN THE ORIGINAL JWT ACCESS TOKENS EXPIRE
