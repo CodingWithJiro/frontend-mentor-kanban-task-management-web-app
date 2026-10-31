@@ -1,6 +1,5 @@
 import type { Request, Response } from "express";
 import prisma from "../../src/lib/prisma.ts";
-import { isInvalidId } from "../utils/validate-id.ts";
 import { getUserBoard } from "../services/resource-access.service.ts";
 
 export async function getBoards(req: Request, res: Response) {
@@ -17,12 +16,7 @@ export async function getBoards(req: Request, res: Response) {
 
 export async function getBoard(req: Request, res: Response) {
   const userId = req.userId!;
-  const boardId = Number(req.params.id);
-  if (isInvalidId(boardId)) {
-    return res.status(400).json({
-      message: "Invalid board ID.",
-    });
-  }
+  const boardId = Number(req.params.boardId);
   const board = await getUserBoard(userId, boardId);
   if (!board) {
     return res.status(404).json({
@@ -60,12 +54,7 @@ export async function createBoard(req: Request, res: Response) {
 export async function updateBoard(req: Request, res: Response) {
   const userId = req.userId!;
   const { name } = req.body;
-  const boardId = Number(req.params.id);
-  if (isInvalidId(boardId)) {
-    return res.status(400).json({
-      message: "Invalid board ID.",
-    });
-  }
+  const boardId = Number(req.params.boardId);
   const existingBoard = await getUserBoard(userId, boardId);
   if (!existingBoard) {
     return res.status(404).json({
@@ -84,12 +73,7 @@ export async function updateBoard(req: Request, res: Response) {
 
 export async function deleteBoard(req: Request, res: Response) {
   const userId = req.userId!;
-  const boardId = Number(req.params.id);
-  if (isInvalidId(boardId)) {
-    return res.status(400).json({
-      message: "Invalid board ID.",
-    });
-  }
+  const boardId = Number(req.params.boardId);
   const existingBoard = await getUserBoard(userId, boardId);
   if (!existingBoard) {
     return res.status(404).json({

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { authenticate } from "../middlewares/authenticate.ts";
 import { validateRequest } from "../middlewares/validate-request.ts";
+import { validateParameterIds } from "../middlewares/validate-parameter.ts";
 import { createBoardSchema } from "../schemas/create-board.schema.ts";
 import { updateBoardSchema } from "../schemas/update-board.schema.ts";
 import {
@@ -14,14 +15,15 @@ import {
 const router = Router();
 
 router.get("/", authenticate, getBoards);
-router.get("/:id", authenticate, getBoard);
+router.get("/:boardId", authenticate, validateParameterIds, getBoard);
 router.post("/", authenticate, validateRequest(createBoardSchema), createBoard);
 router.patch(
-  "/:id",
+  "/:boardId",
   authenticate,
+  validateParameterIds,
   validateRequest(updateBoardSchema),
   updateBoard,
 );
-router.delete("/:id", authenticate, deleteBoard);
+router.delete("/:boardId", authenticate, validateParameterIds, deleteBoard);
 
 export default router;
