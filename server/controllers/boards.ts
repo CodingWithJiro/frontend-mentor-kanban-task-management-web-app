@@ -1,17 +1,9 @@
 import type { Request, Response } from "express";
 import prisma from "../../src/lib/prisma.ts";
-import { createBoardSchema } from "../schemas/create-board.schema.ts";
-import { updateBoardSchema } from "../schemas/update-board.schema.ts";
-import { isInvalidId } from "../utils/validate-id.ts";
 import { getUserBoard } from "../services/resource-access.service.ts";
 
 export async function getBoards(req: Request, res: Response) {
-  const { userId } = req;
-  if (userId === undefined) {
-    return res.status(401).json({
-      message: "Not authorized.",
-    });
-  }
+  const userId = req.userId!;
   const boards = await prisma.board.findMany({
     where: { userId },
     orderBy: { position: "asc" },
@@ -23,18 +15,8 @@ export async function getBoards(req: Request, res: Response) {
 }
 
 export async function getBoard(req: Request, res: Response) {
-  const { userId } = req;
-  if (userId === undefined) {
-    return res.status(401).json({
-      message: "Not authorized.",
-    });
-  }
-  const boardId = Number(req.params.id);
-  if (isInvalidId(boardId)) {
-    return res.status(400).json({
-      message: "Invalid board ID.",
-    });
-  }
+  const userId = req.userId!;
+  const boardId = Number(req.params.boardId);
   const board = await getUserBoard(userId, boardId);
   if (!board) {
     return res.status(404).json({
@@ -48,21 +30,8 @@ export async function getBoard(req: Request, res: Response) {
 }
 
 export async function createBoard(req: Request, res: Response) {
-  const { userId } = req;
-  if (userId === undefined) {
-    return res.status(401).json({
-      message: "Not authorized.",
-    });
-  }
-  const validationResult = createBoardSchema.safeParse(req.body);
-  const isInvalid = !validationResult.success;
-  if (isInvalid) {
-    return res.status(400).json({
-      message: "Invalid board data.",
-      errors: validationResult.error.issues,
-    });
-  }
-  const { name } = validationResult.data;
+  const userId = req.userId!;
+  const { name } = req.body;
   const lastBoard = await prisma.board.findFirst({
     where: { userId },
     orderBy: { position: "desc" },
@@ -83,27 +52,9 @@ export async function createBoard(req: Request, res: Response) {
 }
 
 export async function updateBoard(req: Request, res: Response) {
-  const { userId } = req;
-  if (userId === undefined) {
-    return res.status(401).json({
-      message: "Not authorized.",
-    });
-  }
-  const validationResult = updateBoardSchema.safeParse(req.body);
-  const isInvalid = !validationResult.success;
-  if (isInvalid) {
-    return res.status(400).json({
-      message: "Invalid board data.",
-      errors: validationResult.error.issues,
-    });
-  }
-  const { name } = validationResult.data;
-  const boardId = Number(req.params.id);
-  if (isInvalidId(boardId)) {
-    return res.status(400).json({
-      message: "Invalid board ID.",
-    });
-  }
+  const userId = req.userId!;
+  const { name } = req.body;
+  const boardId = Number(req.params.boardId);
   const existingBoard = await getUserBoard(userId, boardId);
   if (!existingBoard) {
     return res.status(404).json({
@@ -121,18 +72,8 @@ export async function updateBoard(req: Request, res: Response) {
 }
 
 export async function deleteBoard(req: Request, res: Response) {
-  const { userId } = req;
-  if (userId === undefined) {
-    return res.status(401).json({
-      message: "Not authorized.",
-    });
-  }
-  const boardId = Number(req.params.id);
-  if (isInvalidId(boardId)) {
-    return res.status(400).json({
-      message: "Invalid board ID.",
-    });
-  }
+  const userId = req.userId!;
+  const boardId = Number(req.params.boardId);
   const existingBoard = await getUserBoard(userId, boardId);
   if (!existingBoard) {
     return res.status(404).json({
