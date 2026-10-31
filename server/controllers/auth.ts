@@ -1,8 +1,6 @@
 import type { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import prisma from "../../src/lib/prisma.ts";
-import { registerSchema } from "../schemas/register.schema.ts";
-import { loginSchema } from "../schemas/login.schema.ts";
 import {
   getRefreshToken,
   getRefreshTokenMaxAge,
@@ -12,15 +10,7 @@ import { generateAccessToken } from "../services/access-token.service.ts";
 import { setRefreshTokenCookie } from "../utils/cookies.ts";
 
 export async function registerAccount(req: Request, res: Response) {
-  const validationResult = registerSchema.safeParse(req.body);
-  const isInvalid = !validationResult.success;
-  if (isInvalid) {
-    return res.status(400).json({
-      message: "Invalid registration data.",
-      errors: validationResult.error.issues,
-    });
-  }
-  const { name, username, email, password } = validationResult.data;
+  const { name, username, email, password } = req.body;
   const existingUser = await prisma.user.findFirst({
     where: {
       OR: [{ username }, { email }],
@@ -91,15 +81,7 @@ export async function registerAccount(req: Request, res: Response) {
 }
 
 export async function loginAccount(req: Request, res: Response) {
-  const validationResult = loginSchema.safeParse(req.body);
-  const isInvalid = !validationResult.success;
-  if (isInvalid) {
-    return res.status(400).json({
-      message: "Invalid login credentials.",
-      errors: validationResult.error.issues,
-    });
-  }
-  const { identifier, password } = validationResult.data;
+  const { identifier, password } = req.body;
   const user =
     (await prisma.user.findUnique({
       where: { email: identifier },
