@@ -13,3 +13,12 @@ export function setRefreshTokenCookie(
     maxAge: refreshTokenMaxAge,
   });
 }
+
+export function clearRefreshTokenCookie(res: Response) {
+  return res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/api/auth",
+  });
+}

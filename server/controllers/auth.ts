@@ -1,13 +1,17 @@
 import type { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import prisma from "../../src/lib/prisma.ts";
+import { generateAccessToken } from "../services/access-token.service.ts";
 import {
   getRefreshToken,
+  getRefreshTokenHash,
   getRefreshTokenMaxAge,
   saveRefreshToken,
 } from "../services/refresh-token.service.ts";
-import { generateAccessToken } from "../services/access-token.service.ts";
-import { setRefreshTokenCookie } from "../utils/cookies.ts";
+import {
+  clearRefreshTokenCookie,
+  setRefreshTokenCookie,
+} from "../utils/cookies.ts";
 
 export async function registerAccount(req: Request, res: Response) {
   const { name, username, email, password } = req.body;
@@ -118,5 +122,71 @@ export async function loginAccount(req: Request, res: Response) {
       username: user.username,
       email: user.email,
     },
+  });
+}
+
+export async function refreshAccessToken(req: Request, res: Response) {
+  const refreshToken = req.cookies.refreshToken;
+  const isMissingRefreshToken =
+    typeof refreshToken !== "string" || !refreshToken;
+  if (isMissingRefreshToken) {
+    clearRefreshTokenCookie(res);
+    return res.status(401).json({
+      message: "Refresh token is missing.",
+    });
+  }
+  const refreshTokenHash = getRefreshTokenHash(refreshToken);
+  const storedRefreshToken = await prisma.refreshToken.findUnique({
+    where: {
+      tokenHash: refreshTokenHash,
+    },
+  });
+  const isInvalidRefreshToken =
+    !storedRefreshToken ||
+    storedRefreshToken.revokedAt ||
+    storedRefreshToken.expiresAt <= new Date();
+  if (isInvalidRefreshToken) {
+    clearRefreshTokenCookie(res);
+    return res.status(401).json({
+      message: "Invalid or expired refresh token.",
+    });
+  }
+  const userId = storedRefreshToken.userId;
+  const newRefreshToken = getRefreshToken();
+  const newRefreshTokenMaxAge = getRefreshTokenMaxAge();
+  const now = new Date();
+  const isRotated = await prisma.$transaction(async (tx) => {
+    const revokedToken = await tx.refreshToken.updateMany({
+      where: {
+        id: storedRefreshToken.id,
+        revokedAt: null,
+        expiresAt: {
+          gt: now,
+        },
+      },
+      data: {
+        revokedAt: now,
+      },
+    });
+    if (revokedToken.count !== 1) return false;
+    await saveRefreshToken(
+      tx,
+      newRefreshToken,
+      userId,
+      new Date(Date.now() + newRefreshTokenMaxAge),
+    );
+    return true;
+  });
+  if (!isRotated) {
+    clearRefreshTokenCookie(res);
+    return res.status(401).json({
+      message: "Invalid or expired refresh token.",
+    });
+  }
+  const newAccessToken = await generateAccessToken(userId);
+  setRefreshTokenCookie(res, newRefreshToken, newRefreshTokenMaxAge);
+  return res.status(200).json({
+    message: "Access token refreshed successfully.",
+    accessToken: newAccessToken,
   });
 }

@@ -11,7 +11,7 @@ export function getRefreshToken() {
   return randomBytes(32).toString("hex");
 }
 
-function getRefreshTokenHash(refreshToken: string) {
+export function getRefreshTokenHash(refreshToken: string) {
   return createHash("sha256").update(refreshToken).digest("hex");
 }
 
