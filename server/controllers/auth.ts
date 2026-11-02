@@ -190,3 +190,5 @@ export async function refreshAccessToken(req: Request, res: Response) {
     accessToken: newAccessToken,
   });
 }
+
+export async function logoutAccount(req: Request, res: Response) {}
