@@ -1,5 +1,4 @@
 import type { Request, Response } from "express";
-import bcrypt from "bcryptjs";
 import prisma from "../../src/lib/prisma.ts";
 import { generateAccessToken } from "../services/access-token.service.ts";
 import {
@@ -12,6 +11,7 @@ import {
   clearRefreshTokenCookie,
   setRefreshTokenCookie,
 } from "../utils/cookies.ts";
+import { comparePassword, getPasswordHash } from "../utils/password.ts";
 
 export async function registerAccount(req: Request, res: Response) {
   const { name, username, email, password } = req.body;
@@ -26,17 +26,13 @@ export async function registerAccount(req: Request, res: Response) {
   });
   const isUsernameAlreadyInUse = existingUser?.username === username;
   if (isUsernameAlreadyInUse) {
-    return res.status(409).json({
-      message: "Username is already in use.",
-    });
+    return res.status(409).json({ message: "Username is already in use." });
   }
   const isEmailAlreadyInUse = existingUser?.email === email;
   if (isEmailAlreadyInUse) {
-    return res.status(409).json({
-      message: "Email is already in use.",
-    });
+    return res.status(409).json({ message: "Email is already in use." });
   }
-  const passwordHash = await bcrypt.hash(password, 12);
+  const passwordHash = await getPasswordHash(password);
   const refreshToken = getRefreshToken();
   const refreshTokenMaxAge = getRefreshTokenMaxAge();
   try {
@@ -76,9 +72,9 @@ export async function registerAccount(req: Request, res: Response) {
       "code" in err &&
       err.code === "P2002";
     if (isPrismaDuplicateError) {
-      return res.status(409).json({
-        message: "Username or email is already in use.",
-      });
+      return res
+        .status(409)
+        .json({ message: "Username or email is already in use." });
     }
     throw err;
   }
@@ -87,21 +83,13 @@ export async function registerAccount(req: Request, res: Response) {
 export async function loginAccount(req: Request, res: Response) {
   const { identifier, password } = req.body;
   const user =
-    (await prisma.user.findUnique({
-      where: { email: identifier },
-    })) ??
-    (await prisma.user.findUnique({
-      where: { username: identifier },
-    }));
-  const isMissingUser = !user;
-  if (isMissingUser) {
+    (await prisma.user.findUnique({ where: { email: identifier } })) ??
+    (await prisma.user.findUnique({ where: { username: identifier } }));
+  if (!user) {
     return res.status(401).json({ message: "Invalid credentials." });
   }
-  const isInvalidPassword = !(await bcrypt.compare(
-    password,
-    user.passwordHash,
-  ));
-  if (isInvalidPassword) {
+  const isValidPassword = await comparePassword(password, user.passwordHash);
+  if (!isValidPassword) {
     return res.status(401).json({ message: "Invalid credentials." });
   }
   const refreshToken = getRefreshToken();
@@ -131,15 +119,11 @@ export async function refreshAccessToken(req: Request, res: Response) {
     typeof refreshToken !== "string" || !refreshToken;
   if (isMissingRefreshToken) {
     clearRefreshTokenCookie(res);
-    return res.status(401).json({
-      message: "Refresh token is missing.",
-    });
+    return res.status(401).json({ message: "Refresh token is missing." });
   }
   const refreshTokenHash = getRefreshTokenHash(refreshToken);
   const storedRefreshToken = await prisma.refreshToken.findUnique({
-    where: {
-      tokenHash: refreshTokenHash,
-    },
+    where: { tokenHash: refreshTokenHash },
   });
   const isInvalidRefreshToken =
     !storedRefreshToken ||
@@ -147,41 +131,40 @@ export async function refreshAccessToken(req: Request, res: Response) {
     storedRefreshToken.expiresAt <= new Date();
   if (isInvalidRefreshToken) {
     clearRefreshTokenCookie(res);
-    return res.status(401).json({
-      message: "Invalid or expired refresh token.",
-    });
+    return res
+      .status(401)
+      .json({ message: "Invalid or expired refresh token." });
   }
   const userId = storedRefreshToken.userId;
   const newRefreshToken = getRefreshToken();
   const newRefreshTokenMaxAge = getRefreshTokenMaxAge();
+  const newRefreshTokenExpirationDate = new Date(
+    Date.now() + newRefreshTokenMaxAge,
+  );
   const now = new Date();
   const isRotated = await prisma.$transaction(async (tx) => {
     const revokedToken = await tx.refreshToken.updateMany({
       where: {
         id: storedRefreshToken.id,
         revokedAt: null,
-        expiresAt: {
-          gt: now,
-        },
+        expiresAt: { gt: now },
       },
-      data: {
-        revokedAt: now,
-      },
+      data: { revokedAt: now },
     });
     if (revokedToken.count !== 1) return false;
     await saveRefreshToken(
       tx,
       newRefreshToken,
       userId,
-      new Date(Date.now() + newRefreshTokenMaxAge),
+      newRefreshTokenExpirationDate,
     );
     return true;
   });
   if (!isRotated) {
     clearRefreshTokenCookie(res);
-    return res.status(401).json({
-      message: "Invalid or expired refresh token.",
-    });
+    return res
+      .status(401)
+      .json({ message: "Invalid or expired refresh token." });
   }
   const newAccessToken = await generateAccessToken(userId);
   setRefreshTokenCookie(res, newRefreshToken, newRefreshTokenMaxAge);
@@ -201,13 +184,9 @@ export async function logoutAccount(req: Request, res: Response) {
         tokenHash: refreshTokenHash,
         revokedAt: null,
       },
-      data: {
-        revokedAt: new Date(),
-      },
+      data: { revokedAt: new Date() },
     });
   }
   clearRefreshTokenCookie(res);
-  return res.status(200).json({
-    message: "Logged out successfully.",
-  });
+  return res.status(200).json({ message: "Logged out successfully." });
 }
