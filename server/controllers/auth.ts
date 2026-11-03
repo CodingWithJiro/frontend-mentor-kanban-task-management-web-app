@@ -191,4 +191,23 @@ export async function refreshAccessToken(req: Request, res: Response) {
   });
 }
 
-export async function logoutAccount(req: Request, res: Response) {}
+export async function logoutAccount(req: Request, res: Response) {
+  const refreshToken = req.cookies.refreshToken;
+  const isValidRefreshToken = typeof refreshToken === "string" && refreshToken;
+  if (isValidRefreshToken) {
+    const refreshTokenHash = getRefreshTokenHash(refreshToken);
+    await prisma.refreshToken.updateMany({
+      where: {
+        tokenHash: refreshTokenHash,
+        revokedAt: null,
+      },
+      data: {
+        revokedAt: new Date(),
+      },
+    });
+  }
+  clearRefreshTokenCookie(res);
+  return res.status(200).json({
+    message: "Logged out successfully.",
+  });
+}
