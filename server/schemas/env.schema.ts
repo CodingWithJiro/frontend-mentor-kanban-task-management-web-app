@@ -19,4 +19,5 @@ export const envSchema = z.object({
     .string()
     .regex(/^\d+\s*(s|m|h|d|w|y)$/i, "Invalid refresh token expiration format")
     .default("7d"),
+  BCRYPT_SALT_ROUNDS: z.coerce.number().int().min(4).max(15).default(12),
 });
