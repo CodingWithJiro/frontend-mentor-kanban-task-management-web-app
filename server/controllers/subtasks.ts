@@ -12,31 +12,21 @@ export async function getSubtasks(req: Request, res: Response) {
   const boardId = Number(req.params.boardId);
   const board = await getUserBoard(userId, boardId);
   if (!board) {
-    return res.status(404).json({
-      message: "Board not found.",
-    });
+    return res.status(404).json({ message: "Board not found." });
   }
   const columnId = Number(req.params.columnId);
   const column = await getBoardColumn(boardId, columnId);
   if (!column) {
-    return res.status(404).json({
-      message: "Column not found.",
-    });
+    return res.status(404).json({ message: "Column not found." });
   }
   const taskId = Number(req.params.taskId);
   const task = await getColumnTask(columnId, taskId);
   if (!task) {
-    return res.status(404).json({
-      message: "Task not found.",
-    });
+    return res.status(404).json({ message: "Task not found." });
   }
   const subtasks = await prisma.subtask.findMany({
-    where: {
-      taskId,
-    },
-    orderBy: {
-      position: "asc",
-    },
+    where: { taskId },
+    orderBy: { position: "asc" },
   });
   return res.status(200).json({
     message: "Subtasks successfully retrieved.",
@@ -49,30 +39,22 @@ export async function getSubtask(req: Request, res: Response) {
   const boardId = Number(req.params.boardId);
   const board = await getUserBoard(userId, boardId);
   if (!board) {
-    return res.status(404).json({
-      message: "Board not found.",
-    });
+    return res.status(404).json({ message: "Board not found." });
   }
   const columnId = Number(req.params.columnId);
   const column = await getBoardColumn(boardId, columnId);
   if (!column) {
-    return res.status(404).json({
-      message: "Column not found.",
-    });
+    return res.status(404).json({ message: "Column not found." });
   }
   const taskId = Number(req.params.taskId);
   const task = await getColumnTask(columnId, taskId);
   if (!task) {
-    return res.status(404).json({
-      message: "Task not found.",
-    });
+    return res.status(404).json({ message: "Task not found." });
   }
   const subtaskId = Number(req.params.subtaskId);
   const subtask = await getTaskSubtask(taskId, subtaskId);
   if (!subtask) {
-    return res.status(404).json({
-      message: "Subtask not found.",
-    });
+    return res.status(404).json({ message: "Subtask not found." });
   }
   return res.status(200).json({
     message: "Subtask successfully retrieved.",
@@ -86,23 +68,17 @@ export async function createSubtask(req: Request, res: Response) {
   const boardId = Number(req.params.boardId);
   const board = await getUserBoard(userId, boardId);
   if (!board) {
-    return res.status(404).json({
-      message: "Board not found.",
-    });
+    return res.status(404).json({ message: "Board not found." });
   }
   const columnId = Number(req.params.columnId);
   const column = await getBoardColumn(boardId, columnId);
   if (!column) {
-    return res.status(404).json({
-      message: "Column not found.",
-    });
+    return res.status(404).json({ message: "Column not found." });
   }
   const taskId = Number(req.params.taskId);
   const task = await getColumnTask(columnId, taskId);
   if (!task) {
-    return res.status(404).json({
-      message: "Task not found.",
-    });
+    return res.status(404).json({ message: "Task not found." });
   }
   const lastSubtask = await prisma.subtask.findFirst({
     where: { taskId },
@@ -130,30 +106,22 @@ export async function updateSubtask(req: Request, res: Response) {
   const boardId = Number(req.params.boardId);
   const board = await getUserBoard(userId, boardId);
   if (!board) {
-    return res.status(404).json({
-      message: "Board not found.",
-    });
+    return res.status(404).json({ message: "Board not found." });
   }
   const columnId = Number(req.params.columnId);
   const column = await getBoardColumn(boardId, columnId);
   if (!column) {
-    return res.status(404).json({
-      message: "Column not found.",
-    });
+    return res.status(404).json({ message: "Column not found." });
   }
   const taskId = Number(req.params.taskId);
   const task = await getColumnTask(columnId, taskId);
   if (!task) {
-    return res.status(404).json({
-      message: "Task not found.",
-    });
+    return res.status(404).json({ message: "Task not found." });
   }
   const subtaskId = Number(req.params.subtaskId);
   const subtask = await getTaskSubtask(taskId, subtaskId);
   if (!subtask) {
-    return res.status(404).json({
-      message: "Subtask not found.",
-    });
+    return res.status(404).json({ message: "Subtask not found." });
   }
   const updatedSubtask = await prisma.subtask.update({
     where: { id: subtaskId },
@@ -173,35 +141,23 @@ export async function deleteSubtask(req: Request, res: Response) {
   const boardId = Number(req.params.boardId);
   const board = await getUserBoard(userId, boardId);
   if (!board) {
-    return res.status(404).json({
-      message: "Board not found.",
-    });
+    return res.status(404).json({ message: "Board not found." });
   }
   const columnId = Number(req.params.columnId);
   const column = await getBoardColumn(boardId, columnId);
   if (!column) {
-    return res.status(404).json({
-      message: "Column not found.",
-    });
+    return res.status(404).json({ message: "Column not found." });
   }
   const taskId = Number(req.params.taskId);
   const task = await getColumnTask(columnId, taskId);
   if (!task) {
-    return res.status(404).json({
-      message: "Task not found.",
-    });
+    return res.status(404).json({ message: "Task not found." });
   }
   const subtaskId = Number(req.params.subtaskId);
   const existingSubtask = await getTaskSubtask(taskId, subtaskId);
   if (!existingSubtask) {
-    return res.status(404).json({
-      message: "Subtask not found.",
-    });
+    return res.status(404).json({ message: "Subtask not found." });
   }
-  await prisma.subtask.delete({
-    where: { id: subtaskId },
-  });
-  return res.status(200).json({
-    message: "Subtask successfully deleted.",
-  });
+  await prisma.subtask.delete({ where: { id: subtaskId } });
+  return res.status(200).json({ message: "Subtask successfully deleted." });
 }

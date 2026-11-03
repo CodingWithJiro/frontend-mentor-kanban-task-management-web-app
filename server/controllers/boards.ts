@@ -19,9 +19,7 @@ export async function getBoard(req: Request, res: Response) {
   const boardId = Number(req.params.boardId);
   const board = await getUserBoard(userId, boardId);
   if (!board) {
-    return res.status(404).json({
-      message: "Board not found.",
-    });
+    return res.status(404).json({ message: "Board not found." });
   }
   return res.status(200).json({
     message: "Board data successfully obtained.",
@@ -57,9 +55,7 @@ export async function updateBoard(req: Request, res: Response) {
   const boardId = Number(req.params.boardId);
   const existingBoard = await getUserBoard(userId, boardId);
   if (!existingBoard) {
-    return res.status(404).json({
-      message: "Board not found.",
-    });
+    return res.status(404).json({ message: "Board not found." });
   }
   const updatedBoard = await prisma.board.update({
     where: { id: boardId },
@@ -76,16 +72,8 @@ export async function deleteBoard(req: Request, res: Response) {
   const boardId = Number(req.params.boardId);
   const existingBoard = await getUserBoard(userId, boardId);
   if (!existingBoard) {
-    return res.status(404).json({
-      message: "Board not found.",
-    });
+    return res.status(404).json({ message: "Board not found." });
   }
-  await prisma.board.delete({
-    where: {
-      id: boardId,
-    },
-  });
-  return res.status(200).json({
-    message: "Board successfully deleted.",
-  });
+  await prisma.board.delete({ where: { id: boardId } });
+  return res.status(200).json({ message: "Board successfully deleted." });
 }
