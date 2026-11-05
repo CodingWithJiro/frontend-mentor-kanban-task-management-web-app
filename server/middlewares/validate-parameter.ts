@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { isInvalidId } from "../utils/validate-id";
+import { isInvalidId } from "../utils/validate-id.ts";
 
 export function validateParameterIds(
   req: Request,
