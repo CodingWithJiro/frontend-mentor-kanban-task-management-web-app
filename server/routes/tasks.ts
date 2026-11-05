@@ -1,5 +1,9 @@
 import { Router } from "express";
 import { authenticate } from "../middlewares/authenticate.ts";
+import { validateParameterIds } from "../middlewares/validate-parameter.ts";
+import { validateRequest } from "../middlewares/validate-request.ts";
+import { createTaskSchema } from "../schemas/create-task.schema.ts";
+import { updateTaskSchema } from "../schemas/update-task.schema.ts";
 import {
   createTask,
   deleteTask,
@@ -10,10 +14,22 @@ import {
 
 const router = Router({ mergeParams: true });
 
-router.get("/", authenticate, getTasks);
-router.get("/:taskId", authenticate, getTask);
-router.post("/", authenticate, createTask);
-router.put("/:taskId", authenticate, updateTask);
-router.delete("/:taskId", authenticate, deleteTask);
+router.get("/", authenticate, validateParameterIds, getTasks);
+router.get("/:taskId", authenticate, validateParameterIds, getTask);
+router.post(
+  "/",
+  authenticate,
+  validateParameterIds,
+  validateRequest(createTaskSchema),
+  createTask,
+);
+router.put(
+  "/:taskId",
+  authenticate,
+  validateParameterIds,
+  validateRequest(updateTaskSchema),
+  updateTask,
+);
+router.delete("/:taskId", authenticate, validateParameterIds, deleteTask);
 
 export default router;

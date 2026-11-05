@@ -1,23 +1,20 @@
 import type { Request, Response } from "express";
 import prisma from "../../src/lib/prisma.ts";
-import bcrypt from "bcryptjs";
-import { SignJWT } from "jose";
-import { registerSchema } from "../schemas/register.schema.ts";
-import { loginSchema } from "../schemas/login.schema.ts";
-import { JWT_SECRET } from "../config/env.ts";
+import { generateAccessToken } from "../services/access-token.service.ts";
+import {
+  getRefreshToken,
+  getRefreshTokenHash,
+  getRefreshTokenMaxAge,
+  saveRefreshToken,
+} from "../services/refresh-token.service.ts";
+import {
+  clearRefreshTokenCookie,
+  setRefreshTokenCookie,
+} from "../utils/cookies.ts";
+import { comparePassword, getPasswordHash } from "../utils/password.ts";
 
 export async function registerAccount(req: Request, res: Response) {
-  const validationResult = registerSchema.safeParse(req.body);
-  const isInvalid = !validationResult.success;
-  if (isInvalid) {
-    return res.status(400).json({
-      message: "Invalid registration data.",
-      errors: validationResult.error.issues,
-    });
-  }
-
-  const { name, username, email, password } = validationResult.data;
-
+  const { name, username, email, password } = req.body;
   const existingUser = await prisma.user.findFirst({
     where: {
       OR: [{ username }, { email }],
@@ -27,42 +24,39 @@ export async function registerAccount(req: Request, res: Response) {
       email: true,
     },
   });
-
   const isUsernameAlreadyInUse = existingUser?.username === username;
   if (isUsernameAlreadyInUse) {
-    return res.status(409).json({
-      message: "Username is already in use.",
-    });
+    return res.status(409).json({ message: "Username is already in use." });
   }
-
   const isEmailAlreadyInUse = existingUser?.email === email;
   if (isEmailAlreadyInUse) {
-    return res.status(409).json({
-      message: "Email is already in use.",
-    });
+    return res.status(409).json({ message: "Email is already in use." });
   }
-
-  const passwordHash = await bcrypt.hash(password, 12);
-
+  const passwordHash = await getPasswordHash(password);
+  const refreshToken = getRefreshToken();
+  const refreshTokenMaxAge = getRefreshTokenMaxAge();
   try {
-    const user = await prisma.user.create({
-      data: {
-        name,
-        username,
-        email,
-        passwordHash,
-      },
+    const user = await prisma.$transaction(async (tx) => {
+      const newUser = await tx.user.create({
+        data: {
+          name,
+          username,
+          email,
+          passwordHash,
+        },
+      });
+      await saveRefreshToken(
+        tx,
+        refreshToken,
+        newUser.id,
+        new Date(Date.now() + refreshTokenMaxAge),
+      );
+      return newUser;
     });
-
-    const token = await new SignJWT({})
-      .setProtectedHeader({ alg: "HS256" })
-      .setSubject(String(user.id))
-      .setIssuedAt()
-      .setExpirationTime("1h")
-      .sign(JWT_SECRET);
-
+    const accessToken = await generateAccessToken(user.id);
+    setRefreshTokenCookie(res, refreshToken, refreshTokenMaxAge);
     return res.status(201).json({
-      token,
+      accessToken,
       user: {
         id: user.id,
         name: user.name,
@@ -78,56 +72,38 @@ export async function registerAccount(req: Request, res: Response) {
       "code" in err &&
       err.code === "P2002";
     if (isPrismaDuplicateError) {
-      return res.status(409).json({
-        message: "Username or email is already in use.",
-      });
+      return res
+        .status(409)
+        .json({ message: "Username or email is already in use." });
     }
     throw err;
   }
 }
 
 export async function loginAccount(req: Request, res: Response) {
-  const validationResult = loginSchema.safeParse(req.body);
-  const isInvalid = !validationResult.success;
-  if (isInvalid) {
-    return res.status(400).json({
-      message: "Invalid login credentials.",
-      errors: validationResult.error.issues,
-    });
-  }
-
-  const { identifier, password } = validationResult.data;
-
+  const { identifier, password } = req.body;
   const user =
-    (await prisma.user.findUnique({
-      where: { email: identifier },
-    })) ??
-    (await prisma.user.findUnique({
-      where: { username: identifier },
-    }));
-
-  const isMissingUser = !user;
-  if (isMissingUser) {
+    (await prisma.user.findUnique({ where: { email: identifier } })) ??
+    (await prisma.user.findUnique({ where: { username: identifier } }));
+  if (!user) {
     return res.status(401).json({ message: "Invalid credentials." });
   }
-
-  const isInvalidPassword = !(await bcrypt.compare(
-    password,
-    user.passwordHash,
-  ));
-  if (isInvalidPassword) {
+  const isValidPassword = await comparePassword(password, user.passwordHash);
+  if (!isValidPassword) {
     return res.status(401).json({ message: "Invalid credentials." });
   }
-
-  const token = await new SignJWT({})
-    .setProtectedHeader({ alg: "HS256" })
-    .setSubject(String(user.id))
-    .setIssuedAt()
-    .setExpirationTime("1h")
-    .sign(JWT_SECRET);
-
+  const refreshToken = getRefreshToken();
+  const refreshTokenMaxAge = getRefreshTokenMaxAge();
+  await saveRefreshToken(
+    prisma,
+    refreshToken,
+    user.id,
+    new Date(Date.now() + refreshTokenMaxAge),
+  );
+  const accessToken = await generateAccessToken(user.id);
+  setRefreshTokenCookie(res, refreshToken, refreshTokenMaxAge);
   return res.status(200).json({
-    token,
+    accessToken,
     user: {
       id: user.id,
       name: user.name,
@@ -135,4 +111,82 @@ export async function loginAccount(req: Request, res: Response) {
       email: user.email,
     },
   });
+}
+
+export async function refreshAccessToken(req: Request, res: Response) {
+  const refreshToken = req.cookies.refreshToken;
+  const isMissingRefreshToken =
+    typeof refreshToken !== "string" || !refreshToken;
+  if (isMissingRefreshToken) {
+    clearRefreshTokenCookie(res);
+    return res.status(401).json({ message: "Refresh token is missing." });
+  }
+  const refreshTokenHash = getRefreshTokenHash(refreshToken);
+  const storedRefreshToken = await prisma.refreshToken.findUnique({
+    where: { tokenHash: refreshTokenHash },
+  });
+  const isInvalidRefreshToken =
+    !storedRefreshToken ||
+    storedRefreshToken.revokedAt ||
+    storedRefreshToken.expiresAt <= new Date();
+  if (isInvalidRefreshToken) {
+    clearRefreshTokenCookie(res);
+    return res
+      .status(401)
+      .json({ message: "Invalid or expired refresh token." });
+  }
+  const userId = storedRefreshToken.userId;
+  const newRefreshToken = getRefreshToken();
+  const newRefreshTokenMaxAge = getRefreshTokenMaxAge();
+  const newRefreshTokenExpirationDate = new Date(
+    Date.now() + newRefreshTokenMaxAge,
+  );
+  const now = new Date();
+  const isRotated = await prisma.$transaction(async (tx) => {
+    const revokedToken = await tx.refreshToken.updateMany({
+      where: {
+        id: storedRefreshToken.id,
+        revokedAt: null,
+        expiresAt: { gt: now },
+      },
+      data: { revokedAt: now },
+    });
+    if (revokedToken.count !== 1) return false;
+    await saveRefreshToken(
+      tx,
+      newRefreshToken,
+      userId,
+      newRefreshTokenExpirationDate,
+    );
+    return true;
+  });
+  if (!isRotated) {
+    clearRefreshTokenCookie(res);
+    return res
+      .status(401)
+      .json({ message: "Invalid or expired refresh token." });
+  }
+  const newAccessToken = await generateAccessToken(userId);
+  setRefreshTokenCookie(res, newRefreshToken, newRefreshTokenMaxAge);
+  return res.status(200).json({
+    message: "Access token refreshed successfully.",
+    accessToken: newAccessToken,
+  });
+}
+
+export async function logoutAccount(req: Request, res: Response) {
+  const refreshToken = req.cookies.refreshToken;
+  const isValidRefreshToken = typeof refreshToken === "string" && refreshToken;
+  if (isValidRefreshToken) {
+    const refreshTokenHash = getRefreshTokenHash(refreshToken);
+    await prisma.refreshToken.updateMany({
+      where: {
+        tokenHash: refreshTokenHash,
+        revokedAt: null,
+      },
+      data: { revokedAt: new Date() },
+    });
+  }
+  clearRefreshTokenCookie(res);
+  return res.status(200).json({ message: "Logged out successfully." });
 }

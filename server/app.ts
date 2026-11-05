@@ -1,4 +1,5 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth.ts";
 import boardsRouter from "./routes/boards.ts";
 import columnsRouter from "./routes/columns.ts";
@@ -10,6 +11,7 @@ import { errorHandler } from "./middlewares/error-handler.ts";
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 app.use("/api/auth", authRouter);
 app.use("/api/boards", boardsRouter);
 app.use("/api/boards/:boardId/columns", columnsRouter);
