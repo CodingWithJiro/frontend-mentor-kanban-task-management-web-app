@@ -5,16 +5,19 @@
 :root {
   --background: #f4f7fd;
   --foreground: #000112;
+  --background-navbar: #ffffff;
 }
 
 .dark {
   --background: #20212c;
   --foreground: #ffffff;
+  --background-navbar: #2b2c37;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-background-navbar: var(--background-navbar);
   --font-sans: var(--font-plus-jakarta-sans);
   --color-main-purple: #635fc7;
   --color-main-purple-hover: #a8a4ff;
