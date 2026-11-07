@@ -1,4 +1,5 @@
 import type { Ref } from 'react';
+import ThemeToggle from '../theme/theme-toggle';
 
 interface BoardThemeSwitcherModalProps {
   onClose: () => void;
@@ -10,12 +11,18 @@ export default function BoardThemeSwitcherModal({
   dialogRef,
 }: BoardThemeSwitcherModalProps) {
   return (
-    <dialog ref={dialogRef} onClose={onClose}>
+    <dialog
+      className="fixed top-20 left-1/2 -translate-x-1/2 outline-1 outline-red-500"
+      ref={dialogRef}
+      onClose={onClose}
+    >
       <h2>All Boards</h2>
 
       <button type="button" onClick={onClose}>
         Close
       </button>
+
+      <ThemeToggle />
     </dialog>
   );
 }
