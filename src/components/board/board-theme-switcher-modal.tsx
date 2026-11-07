@@ -2,7 +2,7 @@ import type { Ref } from 'react';
 
 interface BoardThemeSwitcherModalProps {
   onClose: () => void;
-  dialogRef: Ref<HTMLDialogElement> | null;
+  dialogRef: Ref<HTMLDialogElement | null>;
 }
 
 export default function BoardThemeSwitcherModal({

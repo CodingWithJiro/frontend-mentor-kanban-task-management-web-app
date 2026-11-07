@@ -1,20 +1,12 @@
 'use client';
-import { useState, useRef } from 'react';
+
 import Image from 'next/image';
 import BoardThemeSwitcherModal from './board-theme-switcher-modal';
+import useBoardThemeSwitcherButton from '@/hooks/use-board-theme-switcher-button';
 
 export default function BoardThemeSwitcherButton() {
-  const [isOpen, setIsOpen] = useState(false);
-  const dialogRef = useRef<HTMLDialogElement>(null);
-
-  const handleOpenModal = () => {
-    dialogRef.current?.showModal();
-    setIsOpen(true);
-  };
-  const handleCloseModal = () => {
-    dialogRef.current?.close();
-    setIsOpen(false);
-  };
+  const { isOpen, dialogRef, handleCloseModal, handleOpenModal } =
+    useBoardThemeSwitcherButton();
 
   return (
     <>
