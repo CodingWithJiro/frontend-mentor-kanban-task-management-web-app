@@ -44,6 +44,7 @@
   --text-body-l--line-height: 1.4375rem;
   --text-body-m: 0.75rem;
   --text-body-m--line-height: 0.9375rem;
+  --breakpoint-xs: 375px;
 }
 
 body {
