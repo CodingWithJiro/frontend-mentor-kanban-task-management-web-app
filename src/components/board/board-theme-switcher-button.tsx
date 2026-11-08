@@ -10,6 +10,10 @@ export default function BoardThemeSwitcherButton() {
 
   return (
     <>
+      {isOpen && (
+        <div className="fixed inset-x-0 top-16 bottom-0 bg-[#000]/50"></div>
+      )}
+
       <button
         className="hover:bg-background-mobile-dropdown focus-visible:outline-main-purple cursor-pointer rounded-full px-2 py-2.5 focus-visible:outline-2 focus-visible:-outline-offset-4"
         type="button"
