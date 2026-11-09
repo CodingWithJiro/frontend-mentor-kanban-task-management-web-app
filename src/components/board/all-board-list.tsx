@@ -24,7 +24,7 @@ export default function AllBoardList() {
           return (
             <li key={id}>
               <button
-                className={`text-heading-m focus-visible:outline-main-purple flex w-full cursor-pointer items-center justify-start gap-3 rounded-r-full px-6 py-3.5 font-bold underline-offset-4 -outline-offset-3 outline-transparent transition-colors focus-visible:outline-2 ${isSelected ? 'bg-main-purple text-white' : 'text-medium-gray hover:text-main-purple hover:underline'}`}
+                className={`text-heading-m focus-visible:outline-main-purple flex w-full cursor-pointer items-center justify-start gap-3 rounded-r-full px-6 py-3.5 font-bold -outline-offset-2 outline-transparent transition-colors focus-visible:outline-2 ${isSelected ? 'bg-main-purple text-white' : 'text-medium-gray hover:text-main-purple hover:bg-background-board-item-hover focus-visible:bg-background-board-item-hover focus-visible:text-main-purple'}`}
                 type="button"
                 title={name}
                 aria-label={`Select ${name} board.`}
