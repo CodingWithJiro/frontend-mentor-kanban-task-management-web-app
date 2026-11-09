@@ -28,6 +28,7 @@ export default function BoardThemeSwitcherModal({
       className="bg-background-modal fixed top-20 left-1/2 w-66 -translate-x-1/2 rounded-lg p-4 transition-colors backdrop:bg-transparent"
       ref={dialogRef}
       onClose={onClose}
+      closedby="any"
     >
       <button
         className="text-medium-gray focus-visible:outline-main-purple focus-visible:text-main-purple hover:text-main-purple absolute top-0 right-0 scale-75 rounded-full p-4 outline-transparent transition-colors focus-visible:outline-2"
