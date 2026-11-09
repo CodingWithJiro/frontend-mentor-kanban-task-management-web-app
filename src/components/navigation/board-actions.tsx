@@ -4,10 +4,9 @@ export default function BoardActions() {
   return (
     <section className="flex items-center justify-end gap-4">
       <button
-        className="bg-main-purple cursor-pointer rounded-3xl px-4.5 py-2.5 opacity-25"
+        className="bg-main-purple focus-visible:outline-main-purple hover:bg-main-purple-hover cursor-pointer rounded-3xl px-4.5 py-2.5 opacity-100 outline-offset-4 outline-transparent transition-colors focus-visible:outline-2"
         type="button"
         aria-label="Add task to this board."
-        disabled
       >
         <Image
           src="/icons/icon-add-task-mobile.svg"
