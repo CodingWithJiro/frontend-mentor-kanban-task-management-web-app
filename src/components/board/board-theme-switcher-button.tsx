@@ -15,7 +15,7 @@ export default function BoardThemeSwitcherButton() {
       )}
 
       <button
-        className="hover:bg-background-mobile-dropdown focus-visible:outline-main-purple cursor-pointer rounded-full px-2 py-2.5 focus-visible:outline-2 focus-visible:-outline-offset-4"
+        className="hover:bg-background-mobile-dropdown focus-visible:outline-main-purple cursor-pointer rounded-full px-2 py-2.5 outline-transparent transition-colors focus-visible:outline-2 focus-visible:-outline-offset-4"
         type="button"
         aria-label="Explore all boards and select one or toggle theme."
         aria-expanded={isOpen}

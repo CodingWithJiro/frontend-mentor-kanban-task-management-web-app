@@ -89,7 +89,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
       suppressHydrationWarning
       className={`${plusJakartaSans.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">
+      <body className="flex min-h-full flex-col transition-colors">
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>

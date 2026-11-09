@@ -17,8 +17,13 @@ export default function EditableBoardName() {
     <>
       {isEditingBoardName ? (
         <form onSubmit={handleBoardNameSubmit}>
+          <label htmlFor="board-name" className="sr-only">
+            Board name
+          </label>
+
           <input
-            className="text-heading-l text-foreground outline-main-purple bg-transparent font-bold outline-offset-4"
+            className="text-heading-l text-foreground focus-visible:outline-main-purple bg-transparent font-bold outline-offset-4 outline-transparent transition-colors"
+            id="board-name"
             ref={inputRef}
             size={12}
             type="text"
@@ -33,16 +38,16 @@ export default function EditableBoardName() {
       ) : (
         <button
           type="button"
-          className="focus-visible:outline-main-purple cursor-pointer focus-visible:outline-offset-4"
+          className="focus-visible:outline-main-purple cursor-pointer outline-transparent transition-colors focus-visible:outline-offset-4"
           onClick={handleBoardNameClick}
           aria-label={`Edit board name: ${boardName}`}
         >
-          <h1
-            className="text-heading-l xs:max-w-45 max-w-30 truncate font-bold"
+          <h2
+            className="text-heading-l xs:max-w-45 max-w-30 truncate font-bold transition-colors"
             title={boardName}
           >
             {boardName}
-          </h1>
+          </h2>
         </button>
       )}
     </>

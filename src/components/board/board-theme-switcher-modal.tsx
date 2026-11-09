@@ -25,12 +25,12 @@ export default function BoardThemeSwitcherModal({
 
   return (
     <dialog
-      className="bg-background-modal fixed top-20 left-1/2 w-66 -translate-x-1/2 rounded-lg p-4 backdrop:bg-transparent"
+      className="bg-background-modal fixed top-20 left-1/2 w-66 -translate-x-1/2 rounded-lg p-4 transition-colors backdrop:bg-transparent"
       ref={dialogRef}
       onClose={onClose}
     >
       <button
-        className="text-medium-gray focus-visible:outline-main-purple focus-visible:text-main-purple hover:text-main-purple absolute top-0 right-0 scale-75 rounded-full p-4 focus-visible:outline-2"
+        className="text-medium-gray focus-visible:outline-main-purple focus-visible:text-main-purple hover:text-main-purple absolute top-0 right-0 scale-75 rounded-full p-4 outline-transparent transition-colors focus-visible:outline-2"
         type="button"
         onClick={onClose}
       >
@@ -52,7 +52,7 @@ export default function BoardThemeSwitcherModal({
             return (
               <li key={id}>
                 <button
-                  className={`text-heading-m focus-visible:outline-main-purple flex w-full cursor-pointer items-center justify-start gap-3 rounded-r-full px-6 py-3.5 font-bold underline-offset-4 -outline-offset-3 focus-visible:outline-2 ${isSelected ? 'bg-main-purple text-white' : 'text-medium-gray hover:text-main-purple hover:underline'}`}
+                  className={`text-heading-m focus-visible:outline-main-purple flex w-full cursor-pointer items-center justify-start gap-3 rounded-r-full px-6 py-3.5 font-bold underline-offset-4 -outline-offset-3 outline-transparent transition-colors focus-visible:outline-2 ${isSelected ? 'bg-main-purple text-white' : 'text-medium-gray hover:text-main-purple hover:underline'}`}
                   type="button"
                   aria-label={`Select ${name} board.`}
                   aria-pressed={isSelected}
@@ -75,7 +75,7 @@ export default function BoardThemeSwitcherModal({
           })}
           <li>
             <button
-              className="text-heading-m text-main-purple focus-visible:outline-main-purple flex w-full cursor-pointer items-center justify-start gap-3 rounded-r-full px-6 py-3.5 font-bold underline-offset-4 -outline-offset-3 hover:underline focus-visible:outline-2"
+              className="text-heading-m text-main-purple focus-visible:outline-main-purple flex w-full cursor-pointer items-center justify-start gap-3 rounded-r-full px-6 py-3.5 font-bold underline-offset-4 -outline-offset-3 outline-transparent transition-colors hover:underline focus-visible:outline-2"
               type="button"
             >
               <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
