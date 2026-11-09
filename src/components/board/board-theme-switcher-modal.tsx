@@ -55,6 +55,7 @@ export default function BoardThemeSwitcherModal({
                 <button
                   className={`text-heading-m focus-visible:outline-main-purple flex w-full cursor-pointer items-center justify-start gap-3 rounded-r-full px-6 py-3.5 font-bold underline-offset-4 -outline-offset-3 outline-transparent transition-colors focus-visible:outline-2 ${isSelected ? 'bg-main-purple text-white' : 'text-medium-gray hover:text-main-purple hover:underline'}`}
                   type="button"
+                  title={name}
                   aria-label={`Select ${name} board.`}
                   aria-pressed={isSelected}
                   onClick={() => handleClick(id)}
@@ -69,7 +70,7 @@ export default function BoardThemeSwitcherModal({
                       fill="currentColor"
                     />
                   </svg>
-                  <span>{name}</span>
+                  <span className="max-w-40 truncate">{name}</span>
                 </button>
               </li>
             );
