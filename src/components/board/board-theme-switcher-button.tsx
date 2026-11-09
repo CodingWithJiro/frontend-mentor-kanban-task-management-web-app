@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import BoardThemeSwitcherModal from './board-theme-switcher-modal';
+import MobileModalBackdrop from '../ui/mobile-modal-backdrop';
 import useBoardThemeSwitcherButton from '@/hooks/use-board-theme-switcher-button';
 
 export default function BoardThemeSwitcherButton() {
@@ -10,9 +11,7 @@ export default function BoardThemeSwitcherButton() {
 
   return (
     <>
-      {isOpen && (
-        <div className="fixed inset-x-0 top-16 bottom-0 bg-[#000]/50"></div>
-      )}
+      {isOpen && <MobileModalBackdrop />}
 
       <button
         className="hover:bg-background-mobile-dropdown focus-visible:outline-main-purple cursor-pointer rounded-full px-2 py-2.5 outline-transparent transition-colors focus-visible:outline-2 focus-visible:-outline-offset-4"
