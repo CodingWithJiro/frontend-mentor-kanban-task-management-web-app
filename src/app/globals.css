@@ -8,6 +8,7 @@
   --background-navbar: #ffffff;
   --background-mobile-dropdown: #635fc71a;
   --background-modal: #ffffff;
+  --background-theme-toggle: #f4f7fd;
 }
 
 .dark {
@@ -16,6 +17,7 @@
   --background-navbar: #2b2c37;
   --background-mobile-dropdown: #3e3f4e;
   --background-modal: #2b2c37;
+  --background-theme-toggle: #20212c;
 }
 
 @theme inline {
@@ -24,6 +26,7 @@
   --color-background-navbar: var(--background-navbar);
   --color-background-mobile-dropdown: var(--background-mobile-dropdown);
   --color-background-modal: var(--background-modal);
+  --color-background-theme-toggle: var(--background-theme-toggle);
   --font-sans: var(--font-plus-jakarta-sans);
   --color-main-purple: #635fc7;
   --color-main-purple-hover: #a8a4ff;
