@@ -1,4 +1,4 @@
-import BoardActions from './board-actions';
+import BoardActions from '../board/board-actions';
 import BoardSelector from './board-selector';
 
 export default function MobileNavBar() {

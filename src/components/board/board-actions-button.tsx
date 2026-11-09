@@ -1,4 +1,4 @@
-export default function EditBoardButton() {
+export default function BoardActionsButton() {
   return (
     <button
       className="text-medium-gray hover:text-main-purple colors focus-visible:outline-main-purple cursor-pointer rounded-full outline-offset-4 transition focus-visible:outline-2"
