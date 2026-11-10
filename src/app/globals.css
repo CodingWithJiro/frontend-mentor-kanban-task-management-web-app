@@ -10,6 +10,7 @@
   --background-modal: #ffffff;
   --background-theme-toggle: #f4f7fd;
   --background-board-item-hover: #6460c71a;
+  --background-board-actions-menu: #ffffff;
 }
 
 .dark {
@@ -20,6 +21,7 @@
   --background-modal: #2b2c37;
   --background-theme-toggle: #20212c;
   --background-board-item-hover: #ffffff;
+  --background-board-actions-menu: #20212c;
 }
 
 @theme inline {
@@ -30,6 +32,7 @@
   --color-background-modal: var(--background-modal);
   --color-background-theme-toggle: var(--background-theme-toggle);
   --color-background-board-item-hover: var(--background-board-item-hover);
+  --color-background-board-actions-menu: var(--background-board-actions-menu);
   --font-sans: var(--font-plus-jakarta-sans);
   --color-main-purple: #635fc7;
   --color-main-purple-hover: #a8a4ff;
@@ -57,6 +60,7 @@
   --text-body-m: 0.75rem;
   --text-body-m--line-height: 0.9375rem;
   --breakpoint-xs: 375px;
+  --drop-shadow-board-actions-menu: 0 10px 20px #364e7e40;
 }
 
 @utility custom-scrollbar {
