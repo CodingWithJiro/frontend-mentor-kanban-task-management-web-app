@@ -8,7 +8,7 @@ export default function BoardActionsMenu() {
         align="end"
         sideOffset={8}
       >
-        <DropdownMenu.Item className="text-body-l text-medium-gray focus-visible:outline-main-purple focus-visible:text-main-purple hover:text-main-purple flex cursor-pointer flex-row items-center justify-start gap-2 rounded-full font-medium underline-offset-4 outline-offset-8 outline-transparent transition-colors hover:underline focus-visible:outline-2">
+        <DropdownMenu.Item className="text-body-l text-medium-gray focus-visible:outline-main-purple focus-visible:text-main-purple hover:text-main-purple flex cursor-pointer flex-row items-center justify-start gap-2 rounded-full font-medium outline-offset-8 outline-transparent transition-colors focus-visible:outline-2">
           <svg
             width="16"
             height="16"
@@ -28,7 +28,7 @@ export default function BoardActionsMenu() {
           <span>Edit Board</span>
         </DropdownMenu.Item>
 
-        <DropdownMenu.Item className="text-body-l text-red focus-visible:outline-red flex cursor-pointer flex-row items-center justify-start gap-2 rounded-full font-medium underline-offset-4 outline-offset-8 outline-transparent transition-colors hover:underline focus-visible:outline-2">
+        <DropdownMenu.Item className="text-body-l text-red focus-visible:outline-red flex cursor-pointer flex-row items-center justify-start gap-2 rounded-full font-medium outline-offset-8 outline-transparent transition-colors focus-visible:outline-2">
           <svg
             width="16"
             height="16"
