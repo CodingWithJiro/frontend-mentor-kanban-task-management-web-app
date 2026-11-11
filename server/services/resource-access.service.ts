@@ -1,4 +1,4 @@
-import prisma from "../../src/lib/prisma.ts";
+import prisma from '../database/prisma.ts';
 
 export async function getUserBoard(userId: number, boardId: number) {
   const userBoard = await prisma.board.findUnique({

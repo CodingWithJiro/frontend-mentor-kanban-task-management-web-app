@@ -1,7 +1,8 @@
-import { envSchema } from "../schemas/env.schema.ts";
+import { envSchema } from '../schemas/env.schema.ts';
 
 const env = envSchema.parse(process.env);
 
+export const DATABASE_URL = env.DATABASE_URL;
 export const PORT = env.PORT;
 export const JWT_SECRET = new TextEncoder().encode(env.JWT_SECRET);
 export const ACCESS_TOKEN_EXPIRES_IN = env.ACCESS_TOKEN_EXPIRES_IN;
