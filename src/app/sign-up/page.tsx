@@ -1,3 +1,4 @@
+import SignUpForm from '@/components/auth/sign-up-form';
 import type { Metadata } from 'next';
 
 const siteUrl = 'https://kanbanweb.vercel.app/sign-up';
@@ -22,5 +23,9 @@ export const metadata: Metadata = {
 };
 
 export default function SignUp() {
-  return <main></main>;
+  return (
+    <main>
+      <SignUpForm />
+    </main>
+  );
 }
