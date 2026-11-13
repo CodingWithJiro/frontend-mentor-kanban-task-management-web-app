@@ -1,8 +1,10 @@
+import Link from 'next/link';
+
 export default function SignUpButton() {
   return (
-    <button
+    <Link
       className="text-heading-m text-main-purple focus-visible:outline-main-purple flex w-full cursor-pointer items-center justify-start gap-3 rounded-r-full px-6 py-2.5 font-bold underline-offset-4 -outline-offset-3 outline-transparent transition-colors hover:underline focus-visible:outline-2"
-      type="button"
+      href="/sign-up"
     >
       <svg
         width="16"
@@ -21,6 +23,6 @@ export default function SignUpButton() {
         <path d="M13 7v5m-2.5-2.5h5" />
       </svg>
       <span>Sign Up</span>
-    </button>
+    </Link>
   );
 }
