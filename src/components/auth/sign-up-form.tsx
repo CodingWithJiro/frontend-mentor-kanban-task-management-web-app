@@ -4,6 +4,7 @@ import type { ChangeEvent, SubmitEvent } from 'react';
 import { useState } from 'react';
 import { validateForm } from '@/utils/validate-form';
 import { registerSchema } from '../../../shared/schemas/register.schema.ts';
+import { API_URL } from '@/config/env.ts';
 
 export default function SignUpForm() {
   const [name, setName] = useState('');
@@ -12,7 +13,7 @@ export default function SignUpForm() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const userData = {
       name,
@@ -25,7 +26,23 @@ export default function SignUpForm() {
       schema: registerSchema,
     });
     if (!validationResult.success) return;
-    console.log(validationResult.data);
+    try {
+      const response = await fetch(`${API_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(validationResult.data),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.message);
+      }
+      console.log('Registration successful!', result);
+    } catch (error) {
+      console.error('Registration failed', error);
+    }
   };
   const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
@@ -91,10 +108,10 @@ export default function SignUpForm() {
           />
         </li>
         <li>
-          <label htmlFor="password">Confirm Password</label>
+          <label htmlFor="confirmPassword">Confirm Password</label>
           <input
-            id="password"
-            name="password"
+            id="confirmPassword"
+            name="confirmPassword"
             type="password"
             value={confirmPassword}
             onChange={handleConfirmPasswordChange}
