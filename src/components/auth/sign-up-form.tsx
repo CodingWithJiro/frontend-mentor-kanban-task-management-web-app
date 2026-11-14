@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { validateForm } from '@/utils/validate-form';
 import { registerSchema } from '../../../shared/schemas/register.schema.ts';
 import { API_URL } from '@/config/env.ts';
+import ThemeToggle from '../theme/theme-toggle.tsx';
 
 export default function SignUpForm() {
   const [name, setName] = useState('');
@@ -61,15 +62,29 @@ export default function SignUpForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form
+      onSubmit={handleSubmit}
+      className="bg-background-form drop-shadow-form rounded-lg p-6 transition-colors"
+    >
+      <h2 className="text-heading-l mb-6 font-bold transition-colors">
+        Sign Up
+      </h2>
+
       <ul>
-        <li>
-          <label htmlFor="name">Name</label>
+        <li className="flex flex-col gap-2">
+          <label
+            className="text-heading-s text-medium-gray font-bold transition-colors"
+            htmlFor="name"
+          >
+            Name
+          </label>
           <input
+            className="outline-medium-gray/25 text-body-l focus-visible:outline-outline-input-focus rounded-sm px-4 py-1 font-medium outline transition-colors"
             id="name"
             name="name"
             type="text"
             value={name}
+            placeholder="ex. John Doe"
             onChange={handleNameChange}
             required
           />
@@ -121,6 +136,8 @@ export default function SignUpForm() {
       </ul>
 
       <button type="submit">Create Account</button>
+
+      <ThemeToggle />
     </form>
   );
 }
