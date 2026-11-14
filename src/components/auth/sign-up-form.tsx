@@ -71,23 +71,24 @@ export default function SignUpForm() {
       </h2>
 
       <ul>
-        <li className="flex flex-col gap-2">
-          <label
-            className="text-heading-s text-medium-gray font-bold transition-colors"
-            htmlFor="name"
-          >
-            Name
-          </label>
+        <li className="relative">
           <input
-            className="outline-medium-gray/25 text-body-l focus-visible:outline-outline-input-focus rounded-sm px-4 py-1 font-medium outline transition-colors"
+            className="peer outline-medium-gray/25 text-body-l focus-visible:outline-main-purple hover:outline-main-purple w-full rounded-sm px-4 py-3 font-medium placeholder-transparent outline-2 transition-colors"
             id="name"
             name="name"
             type="text"
             value={name}
-            placeholder="ex. John Doe"
+            placeholder=""
             onChange={handleNameChange}
             required
           />
+
+          <label
+            className="text-heading-s text-medium-gray peer-focus:bg-background-form peer-focus:text-main-purple peer-hover:text-main-purple peer-not-placeholder-shown:bg-background-form peer-not-placeholder-shown::scale-90 pointer-events-none absolute top-4 left-4 origin-left font-bold transition-all peer-not-placeholder-shown:-top-2 peer-not-placeholder-shown:px-1 peer-focus:-top-2 peer-focus:scale-90 peer-focus:px-1"
+            htmlFor="name"
+          >
+            Name
+          </label>
         </li>
         <li>
           <label htmlFor="username">Username</label>
