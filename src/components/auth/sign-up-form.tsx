@@ -1,6 +1,7 @@
 'use client';
 
 import type { ChangeEvent, FocusEvent, SubmitEvent } from 'react';
+import type { ZodSafeParseResult } from 'zod';
 import Image from 'next/image';
 import { useState } from 'react';
 import { validateForm } from '@/utils/validate-form';
@@ -44,26 +45,41 @@ export default function SignUpForm() {
   });
   const [errors, setErrors] = useState<Errors>({});
 
+  const updateConfirmPasswordError = (isSamePassword: boolean) => {
+    const errorMessage = !isSamePassword
+      ? 'Password does not match.'
+      : undefined;
+    setErrors((prev) => ({ ...prev, confirmPassword: errorMessage }));
+  };
+  const updateFormFieldError = (
+    result: ZodSafeParseResult<string>,
+    field: FormField,
+  ) => {
+    const isStillInputError = !result.success;
+    const errorMessage = result.error?.issues[0].message;
+    setErrors((prev) => {
+      return {
+        ...prev,
+        [field]: isStillInputError ? errorMessage : undefined,
+      };
+    });
+  };
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    const isNameUpdatedWithConfirmInput =
-      name === 'password' && formData.confirmPassword;
-    if (isNameUpdatedWithConfirmInput) {
+    const isUpdatingPassword = name === 'password';
+    const hasConfirmPassword = !!formData.confirmPassword;
+    if (isUpdatingPassword && hasConfirmPassword) {
       const isSamePassword = value === formData.confirmPassword;
-      const errorMessage = !isSamePassword
-        ? 'Password does not match.'
-        : undefined;
-      setErrors((prev) => ({ ...prev, confirmPassword: errorMessage }));
+      updateConfirmPasswordError(isSamePassword);
     }
-    if (name === 'confirmPassword') {
+    const isUpdatingConfirmPassword = name === 'confirmPassword';
+    if (isUpdatingConfirmPassword) {
       const isConfirmPasswordAlreadyInvalid = !!errors.confirmPassword;
       if (isConfirmPasswordAlreadyInvalid) {
         const isSamePassword = value === formData.password;
-        const errorMessage = !isSamePassword
-          ? 'Password does not match.'
-          : undefined;
-        setErrors((prev) => ({ ...prev, confirmPassword: errorMessage }));
+        updateConfirmPasswordError(isSamePassword);
       }
       return;
     }
@@ -71,39 +87,20 @@ export default function SignUpForm() {
     const isAlreadyInputError = !!errors[field];
     if (isAlreadyInputError) {
       const result = registerSchema.shape[field].safeParse(value);
-      setErrors((prev) => {
-        const isStillInputError = !result.success;
-        const errorMessage = result.error?.issues[0].message;
-        return {
-          ...prev,
-          [field]: isStillInputError ? errorMessage : undefined,
-        };
-      });
+      updateFormFieldError(result, field);
     }
   };
   const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    if (name === 'confirmPassword') {
+    const isUpdatingConfirmPassword = name === 'confirmPassword';
+    if (isUpdatingConfirmPassword) {
       const isSamePassword = value === formData.password;
-      const errorMessage = !isSamePassword
-        ? 'Password does not match.'
-        : undefined;
-      setErrors((prev) => ({
-        ...prev,
-        confirmPassword: errorMessage,
-      }));
+      updateConfirmPasswordError(isSamePassword);
       return;
     }
     const field = name as keyof typeof registerSchema.shape;
     const result = registerSchema.shape[field].safeParse(value);
-    setErrors((prev) => {
-      const isStillInputError = !result.success;
-      const errorMessage = result.error?.issues[0].message;
-      return {
-        ...prev,
-        [field]: isStillInputError ? errorMessage : undefined,
-      };
-    });
+    updateFormFieldError(result, field);
   };
   const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
