@@ -57,11 +57,14 @@ export default function SignUpForm() {
       setErrors((prev) => ({ ...prev, confirmPassword: errorMessage }));
     }
     if (name === 'confirmPassword') {
-      const isSamePassword = value === formData.password;
-      const errorMessage = !isSamePassword
-        ? 'Password does not match.'
-        : undefined;
-      setErrors((prev) => ({ ...prev, confirmPassword: errorMessage }));
+      const isConfirmPasswordAlreadyInvalid = !!errors.confirmPassword;
+      if (isConfirmPasswordAlreadyInvalid) {
+        const isSamePassword = value === formData.password;
+        const errorMessage = !isSamePassword
+          ? 'Password does not match.'
+          : undefined;
+        setErrors((prev) => ({ ...prev, confirmPassword: errorMessage }));
+      }
       return;
     }
     const field = name as keyof typeof registerSchema.shape;
