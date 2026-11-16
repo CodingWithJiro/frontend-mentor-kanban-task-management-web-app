@@ -1,6 +1,7 @@
 'use client';
 
 import type { ChangeEvent, FocusEvent, SubmitEvent } from 'react';
+import Image from 'next/image';
 import { useState } from 'react';
 import { validateForm } from '@/utils/validate-form';
 import { registerSchema } from '../../../shared/schemas/register.schema.ts';
@@ -43,6 +44,64 @@ export default function SignUpForm() {
   });
   const [errors, setErrors] = useState<Errors>({});
 
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    const isNameUpdatedWithConfirmInput =
+      name === 'password' && formData.confirmPassword;
+    if (isNameUpdatedWithConfirmInput) {
+      const isSamePassword = value === formData.confirmPassword;
+      const errorMessage = !isSamePassword
+        ? 'Password does not match.'
+        : undefined;
+      setErrors((prev) => ({ ...prev, confirmPassword: errorMessage }));
+    }
+    if (name === 'confirmPassword') {
+      const isSamePassword = value === formData.password;
+      const errorMessage = !isSamePassword
+        ? 'Password does not match.'
+        : undefined;
+      setErrors((prev) => ({ ...prev, confirmPassword: errorMessage }));
+      return;
+    }
+    const field = name as keyof typeof registerSchema.shape;
+    const isAlreadyInputError = !!errors[field];
+    if (isAlreadyInputError) {
+      const result = registerSchema.shape[field].safeParse(value);
+      setErrors((prev) => {
+        const isStillInputError = !result.success;
+        const errorMessage = result.error?.issues[0].message;
+        return {
+          ...prev,
+          [field]: isStillInputError ? errorMessage : undefined,
+        };
+      });
+    }
+  };
+  const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (name === 'confirmPassword') {
+      const isSamePassword = value === formData.password;
+      const errorMessage = !isSamePassword
+        ? 'Password does not match.'
+        : undefined;
+      setErrors((prev) => ({
+        ...prev,
+        confirmPassword: errorMessage,
+      }));
+      return;
+    }
+    const field = name as keyof typeof registerSchema.shape;
+    const result = registerSchema.shape[field].safeParse(value);
+    setErrors((prev) => {
+      const isStillInputError = !result.success;
+      const errorMessage = result.error?.issues[0].message;
+      return {
+        ...prev,
+        [field]: isStillInputError ? errorMessage : undefined,
+      };
+    });
+  };
   const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const userData = {
@@ -74,82 +133,21 @@ export default function SignUpForm() {
       console.error('Registration failed', error);
     }
   };
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    setFormData((prev) => {
-      return { ...prev, [name]: value };
-    });
-
-    if (name === 'confirmPassword') {
-      const isSamePassword = value === formData.password;
-      if (!isSamePassword) {
-        setErrors((prev) => ({
-          ...prev,
-          confirmPassword: 'Password not the same.',
-        }));
-      } else {
-        setErrors((prev) => ({
-          ...prev,
-          confirmPassword: undefined,
-        }));
-      }
-      return;
-    }
-
-    const field = name as keyof typeof registerSchema.shape;
-    if (errors[field]) {
-      const result = registerSchema.shape[field].safeParse(value);
-      setErrors((prev) => {
-        const isError = !result.success;
-        if (isError) {
-          const errorMessage = result.error.issues[0].message;
-          return { ...prev, [field]: errorMessage };
-        }
-        return { ...prev, [field]: undefined };
-      });
-    }
-  };
-  const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    if (name === 'confirmPassword') {
-      const isSamePassword = value === formData.password;
-      if (!isSamePassword) {
-        setErrors((prev) => ({
-          ...prev,
-          confirmPassword: 'Password not the same.',
-        }));
-      } else {
-        setErrors((prev) => ({
-          ...prev,
-          confirmPassword: undefined,
-        }));
-      }
-      return;
-    }
-    const field = name as keyof typeof registerSchema.shape;
-    const result = registerSchema.shape[field].safeParse(value);
-    setErrors((prev) => {
-      const isError = !result.success;
-      if (isError) {
-        const errorMessage = result.error.issues[0].message;
-        return { ...prev, [field]: errorMessage };
-      }
-      return { ...prev, [field]: undefined };
-    });
-  };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-background-form drop-shadow-form rounded-lg p-6 transition-colors"
+      className="bg-background-form drop-shadow-form w-full max-w-120 rounded-lg p-6 transition-colors"
     >
-      <h2 className="text-heading-l mb-6 font-bold transition-colors">
-        Sign Up
-      </h2>
+      <div className="mb-6 flex items-center justify-start gap-2">
+        <Image src="/icons/logo-mobile.svg" width={24} height={25} alt="" />
+        <h2 className="text-heading-l font-bold transition-colors">Sign Up</h2>
+      </div>
 
-      <ul>
+      <ul className="mb-8 flex flex-col gap-6">
         {inputFields.map(({ name, label, type }) => {
+          const errorMessage = errors[name];
+          const isError = !!errorMessage;
           return (
             <li key={name} className="relative">
               <input
@@ -161,30 +159,36 @@ export default function SignUpForm() {
                 placeholder=" "
                 onChange={handleChange}
                 onBlur={handleBlur}
-                aria-invalid={!!errors[name]}
-                aria-describedby={errors[name] ? `${name}-error` : undefined}
+                aria-invalid={isError}
+                aria-describedby={isError ? `${name}-error` : undefined}
                 required
               />
 
               <label
-                className={`text-heading-s text-medium-gray peer-focus:bg-background-form peer-not-placeholder-shown:bg-background-form pointer-events-none absolute top-4 left-4 origin-left font-bold transition-all peer-not-placeholder-shown:-top-2 peer-not-placeholder-shown:scale-90 peer-not-placeholder-shown:px-1 peer-focus:-top-2 peer-focus:scale-90 peer-focus:px-1 ${errors[name] ? 'text-red' : 'peer-focus:text-main-purple peer-hover:text-main-purple'}`}
+                className={`text-heading-s text-medium-gray peer-focus:bg-background-form peer-not-placeholder-shown:bg-background-form pointer-events-none absolute top-4 left-4 origin-left font-bold transition-all peer-not-placeholder-shown:-top-2 peer-not-placeholder-shown:scale-90 peer-not-placeholder-shown:px-1 peer-focus:-top-2 peer-focus:scale-90 peer-focus:px-1 ${isError ? 'text-red' : 'peer-focus:text-main-purple peer-hover:text-main-purple'}`}
                 htmlFor={name}
               >
                 {label}
               </label>
 
-              {errors[name] && (
-                <p id={`${name}-error`} className="text-red text-sm">
-                  {errors[name]}
+              {isError && (
+                <p
+                  id={`${name}-error`}
+                  className="text-red absolute -bottom-4.5 left-0 text-[0.70rem] font-medium"
+                >
+                  {errorMessage}
                 </p>
               )}
             </li>
           );
         })}
       </ul>
-
-      <button type="submit">Create Account</button>
-
+      <button
+        type="submit"
+        className="bg-main-purple hover:bg-main-purple-hover text-body-l mb-4 w-full cursor-pointer rounded-[20px] px-4 py-2 font-bold text-white transition-colors"
+      >
+        Create Account
+      </button>
       <ThemeToggle />
     </form>
   );
