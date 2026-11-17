@@ -214,11 +214,17 @@ export default function SignUpForm() {
     <form
       onSubmit={handleSubmit}
       className="bg-background-form drop-shadow-form w-full max-w-120 rounded-lg p-6 transition-colors"
+      aria-labelledby="signup-heading"
       noValidate
     >
       <div className="mb-6 flex items-center justify-start gap-2">
         <Image src="/icons/logo-mobile.svg" width={24} height={25} alt="" />
-        <h2 className="text-heading-l font-bold transition-colors">Sign Up</h2>
+        <h2
+          id="signup-heading"
+          className="text-heading-l font-bold transition-colors"
+        >
+          Sign Up
+        </h2>
       </div>
 
       <ul className="mb-8 flex flex-col gap-6">
@@ -261,7 +267,10 @@ export default function SignUpForm() {
 
               {isPasswordInput && (
                 <>
-                  <ul className="bg-background mx-auto mt-2 -mb-2 grid grid-cols-2 items-center gap-x-2 gap-y-2 rounded-md p-4 transition-colors">
+                  <ul
+                    id="password-error"
+                    className="bg-background mx-auto mt-2 -mb-2 grid grid-cols-2 items-center gap-x-2 gap-y-2 rounded-md p-4 transition-colors"
+                  >
                     {passwordRules.map(({ errorMessage, rule }) => {
                       const isSatisfied =
                         passwordValidation.success ||
@@ -282,10 +291,16 @@ export default function SignUpForm() {
                   </ul>
                   <button
                     type="button"
-                    onClick={() => handlePasswordVisibilityToggle('password')}
+                    onClick={() => handlePasswordVisibilityToggle(name)}
+                    aria-controls={name}
+                    aria-label={
+                      passwordVisibility[name]
+                        ? `Hide ${label.toLowerCase()}.`
+                        : `Show ${label.toLowerCase()}.`
+                    }
                     className="text-heading-s text-medium-gray hover:bg-background hover:text-main-purple focus-visible:outline-main-purple focus-visible:text-main-purple absolute top-3 right-2 cursor-pointer rounded-full px-2 py-1 font-bold outline-transparent transition-colors focus-visible:outline-2 focus-visible:outline-offset-4"
                   >
-                    {passwordVisibility.password ? 'Hide' : 'Show'}
+                    {passwordVisibility[name] ? 'Hide' : 'Show'}
                   </button>
                 </>
               )}
@@ -293,12 +308,16 @@ export default function SignUpForm() {
               {isConfirmPasswordInput && (
                 <button
                   type="button"
-                  onClick={() =>
-                    handlePasswordVisibilityToggle('confirmPassword')
+                  onClick={() => handlePasswordVisibilityToggle(name)}
+                  aria-controls={name}
+                  aria-label={
+                    passwordVisibility[name]
+                      ? `Hide ${label.toLowerCase()}.`
+                      : `Show ${label.toLowerCase()}.`
                   }
                   className="text-heading-s text-medium-gray hover:bg-background hover:text-main-purple focus-visible:outline-main-purple focus-visible:text-main-purple absolute top-3 right-2 cursor-pointer rounded-full px-2 py-1 font-bold outline-transparent transition-colors focus-visible:outline-2 focus-visible:outline-offset-4"
                 >
-                  {passwordVisibility.confirmPassword ? 'Hide' : 'Show'}
+                  {passwordVisibility[name] ? 'Hide' : 'Show'}
                 </button>
               )}
             </li>
