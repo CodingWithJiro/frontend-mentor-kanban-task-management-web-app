@@ -116,7 +116,6 @@ export default function SignUpForm() {
     });
     const isConfirmPasswordAlreadyInvalid =
       !!errors.confirmPassword || formData.confirmPassword === '';
-    console.log(isConfirmPasswordAlreadyInvalid);
     if (isConfirmPasswordAlreadyInvalid) {
       setErrors((prev) => ({
         ...prev,
