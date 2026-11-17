@@ -27,14 +27,6 @@ interface InputField {
 
 type Errors = Partial<Record<FormField, string>>;
 
-const inputFields: InputField[] = [
-  { name: 'name', label: 'Name', type: 'text' },
-  { name: 'username', label: 'Username', type: 'text' },
-  { name: 'email', label: 'Email', type: 'email' },
-  { name: 'password', label: 'Password', type: 'password' },
-  { name: 'confirmPassword', label: 'Confirm Password', type: 'password' },
-];
-
 const passwordRules = [
   {
     errorMessage: 'Must contain at least 12 characters.',
@@ -71,6 +63,10 @@ export default function SignUpForm() {
     confirmPassword: '',
   });
   const [errors, setErrors] = useState<Errors>({});
+  const [passwordVisibility, setPasswordVisibility] = useState({
+    password: false,
+    confirmPassword: false,
+  });
 
   const updateConfirmPasswordError = (isSamePassword: boolean) => {
     const errorMessage = !isSamePassword
@@ -192,6 +188,27 @@ export default function SignUpForm() {
       console.error('Registration failed', error);
     }
   };
+  const handlePasswordVisibilityToggle = (
+    field: 'password' | 'confirmPassword',
+  ) => {
+    setPasswordVisibility((prev) => ({ ...prev, [field]: !prev[field] }));
+  };
+
+  const inputFields: InputField[] = [
+    { name: 'name', label: 'Name', type: 'text' },
+    { name: 'username', label: 'Username', type: 'text' },
+    { name: 'email', label: 'Email', type: 'email' },
+    {
+      name: 'password',
+      label: 'Password',
+      type: `${passwordVisibility.password ? 'text' : 'password'}`,
+    },
+    {
+      name: 'confirmPassword',
+      label: 'Confirm Password',
+      type: `${passwordVisibility.confirmPassword ? 'text' : 'password'}`,
+    },
+  ];
 
   return (
     <form
@@ -209,6 +226,7 @@ export default function SignUpForm() {
           const errorMessage = errors[name];
           const isError = !!errorMessage;
           const isPasswordInput = name === 'password';
+          const isConfirmPasswordInput = name === 'confirmPassword';
           return (
             <li key={name} className="relative">
               <input
@@ -242,25 +260,46 @@ export default function SignUpForm() {
               )}
 
               {isPasswordInput && (
-                <ul className="bg-background mx-auto mt-2 -mb-2 grid grid-cols-2 items-center gap-x-2 gap-y-2 rounded-md p-4 transition-colors">
-                  {passwordRules.map(({ errorMessage, rule }) => {
-                    const isSatisfied =
-                      passwordValidation.success ||
-                      !failedPasswordRules.includes(errorMessage);
-                    const ruleColor =
-                      isSatisfied && hasStartedTypingPassword
-                        ? 'text-main-purple'
-                        : 'text-medium-gray';
-                    return (
-                      <li
-                        key={rule}
-                        className={`text-body-m font-medium ${ruleColor}`}
-                      >
-                        {rule}
-                      </li>
-                    );
-                  })}
-                </ul>
+                <>
+                  <ul className="bg-background mx-auto mt-2 -mb-2 grid grid-cols-2 items-center gap-x-2 gap-y-2 rounded-md p-4 transition-colors">
+                    {passwordRules.map(({ errorMessage, rule }) => {
+                      const isSatisfied =
+                        passwordValidation.success ||
+                        !failedPasswordRules.includes(errorMessage);
+                      const ruleColor =
+                        isSatisfied && hasStartedTypingPassword
+                          ? 'text-main-purple'
+                          : 'text-medium-gray';
+                      return (
+                        <li
+                          key={rule}
+                          className={`text-body-m font-medium ${ruleColor}`}
+                        >
+                          {rule}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  <button
+                    type="button"
+                    onClick={() => handlePasswordVisibilityToggle('password')}
+                    className="text-heading-s text-medium-gray hover:bg-background hover:text-main-purple focus-visible:outline-main-purple focus-visible:text-main-purple absolute top-3 right-2 cursor-pointer rounded-full px-2 py-1 font-bold outline-transparent transition-colors focus-visible:outline-2 focus-visible:outline-offset-4"
+                  >
+                    {passwordVisibility.password ? 'Hide' : 'Show'}
+                  </button>
+                </>
+              )}
+
+              {isConfirmPasswordInput && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    handlePasswordVisibilityToggle('confirmPassword')
+                  }
+                  className="text-heading-s text-medium-gray hover:bg-background hover:text-main-purple focus-visible:outline-main-purple focus-visible:text-main-purple absolute top-3 right-2 cursor-pointer rounded-full px-2 py-1 font-bold outline-transparent transition-colors focus-visible:outline-2 focus-visible:outline-offset-4"
+                >
+                  {passwordVisibility.confirmPassword ? 'Hide' : 'Show'}
+                </button>
               )}
             </li>
           );
