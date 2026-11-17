@@ -114,7 +114,25 @@ export default function SignUpForm() {
       data: userData,
       schema: registerSchema,
     });
-    if (!validationResult.success) return;
+    const isConfirmPasswordAlreadyInvalid =
+      !!errors.confirmPassword || formData.confirmPassword === '';
+    console.log(isConfirmPasswordAlreadyInvalid);
+    if (isConfirmPasswordAlreadyInvalid) {
+      setErrors((prev) => ({
+        ...prev,
+        confirmPassword: 'Please verify password.',
+      }));
+    }
+    if (!validationResult.success) {
+      const fields: FormField[] = ['name', 'username', 'email', 'password'];
+      const allErrors = validationResult.error.issues;
+      fields.forEach((field) => {
+        const error = allErrors.find(({ path: [name] }) => field === name);
+        const errorMessage = error?.message;
+        setErrors((prev) => ({ ...prev, [field]: errorMessage }));
+      });
+      return;
+    }
     try {
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
@@ -138,6 +156,7 @@ export default function SignUpForm() {
     <form
       onSubmit={handleSubmit}
       className="bg-background-form drop-shadow-form w-full max-w-120 rounded-lg p-6 transition-colors"
+      noValidate
     >
       <div className="mb-6 flex items-center justify-start gap-2">
         <Image src="/icons/logo-mobile.svg" width={24} height={25} alt="" />
