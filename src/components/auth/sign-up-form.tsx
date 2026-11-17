@@ -35,6 +35,33 @@ const inputFields: InputField[] = [
   { name: 'confirmPassword', label: 'Confirm Password', type: 'password' },
 ];
 
+const passwordRules = [
+  {
+    errorMessage: 'Must contain at least 12 characters.',
+    rule: 'Minimum 12 characters',
+  },
+  {
+    errorMessage: 'Must not exceed 128 characters.',
+    rule: 'Maximum 128 characters',
+  },
+  {
+    errorMessage: 'Must contain one lowercase letter.',
+    rule: 'One lowercase letter',
+  },
+  {
+    errorMessage: 'Must contain one uppercase letter.',
+    rule: 'One uppercase letter',
+  },
+  {
+    errorMessage: 'Must contain one number.',
+    rule: 'One number',
+  },
+  {
+    errorMessage: 'Must contain one special character.',
+    rule: 'One special character',
+  },
+];
+
 export default function SignUpForm() {
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -64,6 +91,13 @@ export default function SignUpForm() {
       };
     });
   };
+  const passwordValidation = registerSchema.shape.password.safeParse(
+    formData.password,
+  );
+  const failedPasswordRules = passwordValidation.success
+    ? []
+    : passwordValidation.error.issues.map((issue) => issue.message);
+  const hasStartedTypingPassword = formData.password.length > 0;
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -166,10 +200,11 @@ export default function SignUpForm() {
         {inputFields.map(({ name, label, type }) => {
           const errorMessage = errors[name];
           const isError = !!errorMessage;
+          const isPasswordInput = name === 'password';
           return (
             <li key={name} className="relative">
               <input
-                className={`peer text-body-l outline-medium-gray/25 w-full rounded-sm px-4 py-3 font-medium placeholder-transparent outline-2 transition-colors ${errors[name] ? 'hover:outline-red focus-visible:outline-red outline-red' : 'hover:outline-main-purple focus-visible:outline-main-purple'}`}
+                className={`peer text-body-l outline-medium-gray/25 w-full rounded-sm px-4 py-3 font-medium placeholder-transparent outline-2 transition-colors ${isError ? 'hover:outline-red focus-visible:outline-red outline-red' : 'hover:outline-main-purple focus-visible:outline-main-purple'}`}
                 id={name}
                 name={name}
                 type={type}
@@ -189,13 +224,35 @@ export default function SignUpForm() {
                 {label}
               </label>
 
-              {isError && (
+              {isError && !isPasswordInput && (
                 <p
                   id={`${name}-error`}
                   className="text-red absolute -bottom-4.5 left-0 text-[0.70rem] font-medium"
                 >
                   {errorMessage}
                 </p>
+              )}
+
+              {isPasswordInput && (
+                <ul className="bg-background mt-2 -mb-3.5 grid grid-cols-2 gap-x-4 gap-y-2 rounded-md p-4">
+                  {passwordRules.map(({ errorMessage, rule }) => {
+                    const isSatisfied =
+                      passwordValidation.success ||
+                      !failedPasswordRules.includes(errorMessage);
+                    const ruleColor =
+                      isSatisfied && hasStartedTypingPassword
+                        ? 'text-green-500'
+                        : 'text-medium-gray';
+                    return (
+                      <li
+                        key={rule}
+                        className={`text-body-m font-medium ${ruleColor}`}
+                      >
+                        {rule}
+                      </li>
+                    );
+                  })}
+                </ul>
               )}
             </li>
           );
