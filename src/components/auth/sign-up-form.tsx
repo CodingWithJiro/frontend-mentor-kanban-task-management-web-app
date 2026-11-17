@@ -128,6 +128,14 @@ export default function SignUpForm() {
     const { name, value } = e.target;
     const isUpdatingConfirmPassword = name === 'confirmPassword';
     if (isUpdatingConfirmPassword) {
+      const isEmpty = formData.confirmPassword === '';
+      if (isEmpty) {
+        setErrors((prev) => ({
+          ...prev,
+          confirmPassword: 'Please verify password.',
+        }));
+        return;
+      }
       const isSamePassword = value === formData.password;
       updateConfirmPasswordError(isSamePassword);
       return;
