@@ -68,6 +68,7 @@ export default function SignUpForm() {
     confirmPassword: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverError, setServerError] = useState('');
 
   const updateConfirmPasswordError = (isSamePassword: boolean) => {
     const errorMessage = !isSamePassword
@@ -99,6 +100,7 @@ export default function SignUpForm() {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setServerError('');
     const isUpdatingPassword = name === 'password';
     const hasConfirmPassword = !!formData.confirmPassword;
     if (isUpdatingPassword && hasConfirmPassword) {
@@ -143,6 +145,7 @@ export default function SignUpForm() {
   };
   const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setServerError('');
     const userData = {
       name: formData.name,
       username: formData.username,
@@ -155,21 +158,22 @@ export default function SignUpForm() {
     });
     const isConfirmPasswordAlreadyInvalid =
       !!errors.confirmPassword || formData.confirmPassword === '';
-    if (isConfirmPasswordAlreadyInvalid) {
-      setErrors((prev) => ({
-        ...prev,
-        confirmPassword: 'Please verify password.',
-      }));
-      return;
-    }
-    if (!validationResult.success) {
+    if (!validationResult.success || isConfirmPasswordAlreadyInvalid) {
       const fields: FormField[] = ['name', 'username', 'email', 'password'];
-      const allErrors = validationResult.error.issues;
-      fields.forEach((field) => {
-        const error = allErrors.find(({ path: [name] }) => field === name);
-        const errorMessage = error?.message;
-        setErrors((prev) => ({ ...prev, [field]: errorMessage }));
-      });
+      if (!validationResult.success) {
+        const allErrors = validationResult.error.issues;
+        fields.forEach((field) => {
+          const error = allErrors.find(({ path: [name] }) => field === name);
+          const errorMessage = error?.message;
+          setErrors((prev) => ({ ...prev, [field]: errorMessage }));
+        });
+      }
+      if (isConfirmPasswordAlreadyInvalid) {
+        setErrors((prev) => ({
+          ...prev,
+          confirmPassword: 'Please verify password.',
+        }));
+      }
       return;
     }
     try {
@@ -184,11 +188,16 @@ export default function SignUpForm() {
       });
       const result = await response.json();
       if (!response.ok) {
-        throw new Error(result.message);
+        setServerError(result.message);
+        return;
       }
       console.log('Registration successful!', result);
     } catch (error) {
-      console.error('Registration failed', error);
+      setServerError(
+        error instanceof Error
+          ? error.message
+          : 'Something went wrong. Please try again.',
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -329,13 +338,22 @@ export default function SignUpForm() {
           );
         })}
       </ul>
-      <button
-        type="submit"
-        className="bg-main-purple hover:bg-main-purple-hover text-body-l focus-visible:outline-main-purple mb-4 w-full cursor-pointer rounded-[20px] px-4 py-2 font-bold text-white outline-offset-4 outline-transparent transition-colors focus-visible:outline-2"
-        disabled={isSubmitting}
-      >
-        Create Account
-      </button>
+      <div className="relative">
+        <button
+          type="submit"
+          className="bg-main-purple hover:bg-main-purple-hover text-body-l focus-visible:outline-main-purple mb-4 w-full cursor-pointer rounded-[20px] px-4 py-2 font-bold text-white outline-offset-4 outline-transparent transition-colors focus-visible:outline-2"
+          disabled={isSubmitting}
+        >
+          Create Account
+        </button>
+        {serverError && (
+          <p
+            role="alert"
+            className="text-heading-s text-red absolute -top-5 left-2 font-bold"
+          >{`Sign up failed. ${serverError}`}</p>
+        )}
+      </div>
+
       <ThemeToggle />
     </form>
   );
