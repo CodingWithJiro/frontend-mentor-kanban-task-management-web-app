@@ -67,6 +67,7 @@ export default function SignUpForm() {
     password: false,
     confirmPassword: false,
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const updateConfirmPasswordError = (isSamePassword: boolean) => {
     const errorMessage = !isSamePassword
@@ -159,6 +160,7 @@ export default function SignUpForm() {
         ...prev,
         confirmPassword: 'Please verify password.',
       }));
+      return;
     }
     if (!validationResult.success) {
       const fields: FormField[] = ['name', 'username', 'email', 'password'];
@@ -171,6 +173,7 @@ export default function SignUpForm() {
       return;
     }
     try {
+      setIsSubmitting(true);
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
@@ -186,6 +189,8 @@ export default function SignUpForm() {
       console.log('Registration successful!', result);
     } catch (error) {
       console.error('Registration failed', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
   const handlePasswordVisibilityToggle = (
@@ -327,6 +332,7 @@ export default function SignUpForm() {
       <button
         type="submit"
         className="bg-main-purple hover:bg-main-purple-hover text-body-l focus-visible:outline-main-purple mb-4 w-full cursor-pointer rounded-[20px] px-4 py-2 font-bold text-white outline-offset-4 outline-transparent transition-colors focus-visible:outline-2"
+        disabled={isSubmitting}
       >
         Create Account
       </button>
