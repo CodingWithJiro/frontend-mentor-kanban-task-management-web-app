@@ -38,11 +38,11 @@ const inputFields: InputField[] = [
 const passwordRules = [
   {
     errorMessage: 'Must contain at least 12 characters.',
-    rule: 'Minimum 12 characters',
+    rule: 'Min 12 characters',
   },
   {
     errorMessage: 'Must not exceed 128 characters.',
-    rule: 'Maximum 128 characters',
+    rule: 'Max 128 characters',
   },
   {
     errorMessage: 'Must contain one lowercase letter.',
@@ -242,14 +242,14 @@ export default function SignUpForm() {
               )}
 
               {isPasswordInput && (
-                <ul className="bg-background mt-2 -mb-3.5 grid grid-cols-2 gap-x-4 gap-y-2 rounded-md p-4">
+                <ul className="bg-background mx-auto mt-2 -mb-2 grid grid-cols-2 items-center gap-x-2 gap-y-2 rounded-md p-4 transition-colors">
                   {passwordRules.map(({ errorMessage, rule }) => {
                     const isSatisfied =
                       passwordValidation.success ||
                       !failedPasswordRules.includes(errorMessage);
                     const ruleColor =
                       isSatisfied && hasStartedTypingPassword
-                        ? 'text-green-500'
+                        ? 'text-main-purple'
                         : 'text-medium-gray';
                     return (
                       <li
@@ -268,7 +268,7 @@ export default function SignUpForm() {
       </ul>
       <button
         type="submit"
-        className="bg-main-purple hover:bg-main-purple-hover text-body-l mb-4 w-full cursor-pointer rounded-[20px] px-4 py-2 font-bold text-white transition-colors"
+        className="bg-main-purple hover:bg-main-purple-hover text-body-l focus-visible:outline-main-purple mb-4 w-full cursor-pointer rounded-[20px] px-4 py-2 font-bold text-white outline-offset-4 outline-transparent transition-colors focus-visible:outline-2"
       >
         Create Account
       </button>
