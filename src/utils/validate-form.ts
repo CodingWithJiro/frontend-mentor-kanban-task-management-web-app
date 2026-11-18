@@ -1,10 +1,10 @@
 import type { ZodType } from 'zod';
 
-interface validateFormProps {
-  data: unknown;
-  schema: ZodType;
+interface ValidateFormProps<T> {
+  data: T;
+  schema: ZodType<T>;
 }
 
-export function validateForm({ data, schema }: validateFormProps) {
+export function validateForm<T>({ data, schema }: ValidateFormProps<T>) {
   return schema.safeParse(data);
 }
