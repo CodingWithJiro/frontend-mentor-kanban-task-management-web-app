@@ -359,7 +359,7 @@ export default function SignUpForm() {
         )}
         {successMessage && (
           <p
-            role="alert"
+            role="status"
             className="text-heading-s absolute -top-5 left-2 font-bold text-green-500 transition-colors"
           >
             {successMessage}
