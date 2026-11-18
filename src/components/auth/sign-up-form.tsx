@@ -69,6 +69,7 @@ export default function SignUpForm() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const updateConfirmPasswordError = (isSamePassword: boolean) => {
     const errorMessage = !isSamePassword
@@ -101,6 +102,7 @@ export default function SignUpForm() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setServerError('');
+    setSuccessMessage('');
     const isUpdatingPassword = name === 'password';
     const hasConfirmPassword = !!formData.confirmPassword;
     if (isUpdatingPassword && hasConfirmPassword) {
@@ -146,6 +148,7 @@ export default function SignUpForm() {
   const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setServerError('');
+    setSuccessMessage('');
     const userData = {
       name: formData.name,
       username: formData.username,
@@ -191,6 +194,7 @@ export default function SignUpForm() {
         setServerError(result.message);
         return;
       }
+      setSuccessMessage(result.message);
       console.log('Registration successful!', result);
     } catch (error) {
       setServerError(
@@ -350,8 +354,16 @@ export default function SignUpForm() {
         {serverError && (
           <p
             role="alert"
-            className="text-heading-s text-red absolute -top-5 left-2 font-bold"
+            className="text-heading-s text-red absolute -top-5 left-2 font-bold transition-colors"
           >{`Sign up failed. ${serverError}`}</p>
+        )}
+        {successMessage && (
+          <p
+            role="alert"
+            className="text-heading-s absolute -top-5 left-2 font-bold text-green-500 transition-colors"
+          >
+            {successMessage}
+          </p>
         )}
       </div>
 
