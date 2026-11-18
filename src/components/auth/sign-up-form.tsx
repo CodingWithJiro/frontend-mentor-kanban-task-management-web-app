@@ -195,7 +195,6 @@ export default function SignUpForm() {
         return;
       }
       setSuccessMessage(result.message);
-      console.log('Registration successful!', result);
     } catch (error) {
       setServerError(
         error instanceof Error
@@ -366,7 +365,6 @@ export default function SignUpForm() {
           </p>
         )}
       </div>
-
       <ThemeToggle />
     </form>
   );
