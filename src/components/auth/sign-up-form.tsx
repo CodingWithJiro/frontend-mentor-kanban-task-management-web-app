@@ -4,11 +4,11 @@ import type { ChangeEvent, FocusEvent, SubmitEvent } from 'react';
 import type { ZodSafeParseResult } from 'zod';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { validateForm } from '@/utils/validate-form';
 import { registerSchema } from '../../../shared/schemas/register.schema.ts';
-import { API_URL } from '@/config/env.ts';
 import { useAuthStore } from '@/stores/auth.store.ts';
+import { registerAccount } from '@/services/auth.service.ts';
+import Image from 'next/image';
 import ThemeToggle from '../theme/theme-toggle.tsx';
 
 interface FormData {
@@ -25,6 +25,19 @@ interface InputField {
   name: FormField;
   label: string;
   type: string;
+}
+
+interface AuthUser {
+  id: number;
+  name: string;
+  username: string;
+  email: string;
+}
+
+interface RegisterResponse {
+  message: string;
+  accessToken: string;
+  user: AuthUser;
 }
 
 type Errors = Partial<Record<FormField, string>>;
@@ -185,19 +198,9 @@ export default function SignUpForm() {
     }
     try {
       setIsSubmitting(true);
-      const response = await fetch(`${API_URL}/api/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(validationResult.data),
-      });
-      const result = await response.json();
-      if (!response.ok) {
-        setServerError(result.message);
-        return;
-      }
+      const result: RegisterResponse = await registerAccount(
+        validationResult.data,
+      );
       setSuccessMessage(result.message);
       updateAuth(result.accessToken, result.user);
       router.push('/');
