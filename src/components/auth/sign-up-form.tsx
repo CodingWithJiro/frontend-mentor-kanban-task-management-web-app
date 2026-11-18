@@ -2,11 +2,13 @@
 
 import type { ChangeEvent, FocusEvent, SubmitEvent } from 'react';
 import type { ZodSafeParseResult } from 'zod';
-import Image from 'next/image';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { validateForm } from '@/utils/validate-form';
 import { registerSchema } from '../../../shared/schemas/register.schema.ts';
 import { API_URL } from '@/config/env.ts';
+import { useAuthStore } from '@/stores/auth.store.ts';
 import ThemeToggle from '../theme/theme-toggle.tsx';
 
 interface FormData {
@@ -70,6 +72,8 @@ export default function SignUpForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const updateAuth = useAuthStore((state) => state.updateAuth);
+  const router = useRouter();
 
   const updateConfirmPasswordError = (isSamePassword: boolean) => {
     const errorMessage = !isSamePassword
@@ -195,6 +199,8 @@ export default function SignUpForm() {
         return;
       }
       setSuccessMessage(result.message);
+      updateAuth(result.accessToken, result.user);
+      router.push('/');
     } catch (error) {
       setServerError(
         error instanceof Error
