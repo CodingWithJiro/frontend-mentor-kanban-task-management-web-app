@@ -1,42 +1,18 @@
 import type { ChangeEvent, FocusEvent, SubmitEvent } from 'react';
 import type { ZodSafeParseResult } from 'zod';
+import type {
+  Errors,
+  FormData,
+  FormField,
+  InputData,
+  RegisterResponse,
+} from '@/types/sign-up-form.type';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { validateForm } from '@/utils/validate-form';
 import { registerSchema } from '../../shared/schemas/register.schema';
 import { useAuthStore } from '@/stores/auth.store.ts';
 import { registerAccount } from '@/services/auth.service.ts';
-
-interface FormData {
-  name: string;
-  username: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
-
-type FormField = keyof FormData;
-
-interface InputField {
-  name: FormField;
-  label: string;
-  type: string;
-}
-
-interface AuthUser {
-  id: number;
-  name: string;
-  username: string;
-  email: string;
-}
-
-interface RegisterResponse {
-  message: string;
-  accessToken: string;
-  user: AuthUser;
-}
-
-type Errors = Partial<Record<FormField, string>>;
 
 const passwordRules = [
   {
@@ -104,7 +80,7 @@ export default function useSignUpForm() {
     });
   };
 
-  const inputFields: InputField[] = [
+  const inputData: InputData[] = [
     { name: 'name', label: 'Name', type: 'text' },
     { name: 'username', label: 'Username', type: 'text' },
     { name: 'email', label: 'Email', type: 'email' },
@@ -234,7 +210,7 @@ export default function useSignUpForm() {
 
   return {
     handleSubmit,
-    inputFields,
+    inputData,
     errors,
     formData,
     handleChange,

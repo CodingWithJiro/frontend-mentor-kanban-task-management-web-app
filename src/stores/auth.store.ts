@@ -1,11 +1,5 @@
+import type { AuthUser } from '@/types/auth.type';
 import { create } from 'zustand';
-
-interface AuthUser {
-  id: number;
-  name: string;
-  username: string;
-  email: string;
-}
 
 interface AuthStore {
   accessToken: string | null;

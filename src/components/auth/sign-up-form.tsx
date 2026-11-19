@@ -7,7 +7,7 @@ import useSignUpForm from '@/hooks/use-sign-up-form.ts';
 export default function SignUpForm() {
   const {
     handleSubmit,
-    inputFields,
+    inputData,
     errors,
     formData,
     handleChange,
@@ -41,7 +41,7 @@ export default function SignUpForm() {
       </div>
 
       <ul className="mb-8 flex flex-col gap-6">
-        {inputFields.map(({ name, label, type }) => {
+        {inputData.map(({ name, label, type }) => {
           const errorMessage = errors[name];
           const isError = !!errorMessage;
           const isPasswordInput = name === 'password';
