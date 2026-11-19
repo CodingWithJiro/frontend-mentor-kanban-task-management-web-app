@@ -1,6 +1,7 @@
 'use client';
 
 import useSignUpForm from '@/hooks/use-sign-up-form';
+import SignUpPasswordRules from './sign-up-password-rules';
 
 export default function SignUpInputs() {
   const {
@@ -9,10 +10,6 @@ export default function SignUpInputs() {
     formData,
     handleChange,
     handleBlur,
-    passwordRules,
-    passwordValidation,
-    failedPasswordRules,
-    hasStartedTypingPassword,
     passwordVisibility,
     handlePasswordVisibilityToggle,
   } = useSignUpForm();
@@ -58,28 +55,8 @@ export default function SignUpInputs() {
 
             {isPasswordInput && (
               <>
-                <ul
-                  id="password-error"
-                  className="bg-background mx-auto mt-2 -mb-2 grid grid-cols-2 items-center gap-x-2 gap-y-2 rounded-md p-4 transition-colors"
-                >
-                  {passwordRules.map(({ errorMessage, rule }) => {
-                    const isSatisfied =
-                      passwordValidation.success ||
-                      !failedPasswordRules.includes(errorMessage);
-                    const ruleColor =
-                      isSatisfied && hasStartedTypingPassword
-                        ? 'text-main-purple'
-                        : 'text-medium-gray';
-                    return (
-                      <li
-                        key={rule}
-                        className={`text-body-m font-medium ${ruleColor}`}
-                      >
-                        {rule}
-                      </li>
-                    );
-                  })}
-                </ul>
+                <SignUpPasswordRules />
+
                 <button
                   type="button"
                   onClick={() => handlePasswordVisibilityToggle(name)}
