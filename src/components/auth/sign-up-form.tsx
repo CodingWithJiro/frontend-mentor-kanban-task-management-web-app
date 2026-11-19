@@ -1,8 +1,8 @@
 'use client';
 
-import Image from 'next/image';
-import ThemeToggle from '../theme/theme-toggle.tsx';
 import useSignUpForm from '@/hooks/use-sign-up-form.ts';
+import ThemeToggle from '../theme/theme-toggle.tsx';
+import SignUpHeader from './sign-up-header.tsx';
 
 export default function SignUpForm() {
   const {
@@ -30,15 +30,7 @@ export default function SignUpForm() {
       aria-labelledby="signup-heading"
       noValidate
     >
-      <div className="mb-6 flex items-center justify-start gap-2">
-        <Image src="/icons/logo-mobile.svg" width={24} height={25} alt="" />
-        <h2
-          id="signup-heading"
-          className="text-heading-l font-bold transition-colors"
-        >
-          Sign Up
-        </h2>
-      </div>
+      <SignUpHeader />
 
       <ul className="mb-8 flex flex-col gap-6">
         {inputData.map(({ name, label, type }) => {
