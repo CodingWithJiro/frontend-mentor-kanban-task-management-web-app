@@ -6,8 +6,23 @@ import SignUpHeader from './sign-up-header.tsx';
 import SignUpInputs from './sign-up-inputs.tsx';
 
 export default function SignUpForm() {
-  const { handleSubmit, isSubmitting, serverError, successMessage } =
-    useSignUpForm();
+  const {
+    handleSubmit,
+    inputData,
+    errors,
+    formData,
+    handleChange,
+    handleBlur,
+    passwordRules,
+    failedPasswordRules,
+    passwordValidation,
+    hasStartedTypingPassword,
+    handlePasswordVisibilityToggle,
+    passwordVisibility,
+    isSubmitting,
+    serverError,
+    successMessage,
+  } = useSignUpForm();
 
   return (
     <form
@@ -17,7 +32,19 @@ export default function SignUpForm() {
       noValidate
     >
       <SignUpHeader />
-      <SignUpInputs />
+      <SignUpInputs
+        inputData={inputData}
+        errors={errors}
+        formData={formData}
+        handleChange={handleChange}
+        handleBlur={handleBlur}
+        handlePasswordVisibilityToggle={handlePasswordVisibilityToggle}
+        passwordVisibility={passwordVisibility}
+        passwordRules={passwordRules}
+        failedPasswordRules={failedPasswordRules}
+        passwordValidation={passwordValidation}
+        hasStartedTypingPassword={hasStartedTypingPassword}
+      />
 
       <div className="relative">
         <button

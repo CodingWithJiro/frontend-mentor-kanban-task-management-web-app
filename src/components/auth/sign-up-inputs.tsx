@@ -1,19 +1,46 @@
 'use client';
 
-import useSignUpForm from '@/hooks/use-sign-up-form';
+import type { Errors, FormData, InputData } from '@/types/sign-up-form.type';
+import type { ChangeEvent, FocusEvent } from 'react';
+import type { ZodSafeParseResult } from 'zod';
 import SignUpPasswordRules from './sign-up-password-rules';
+import ShowPasswordButton from './show-password-button';
 
-export default function SignUpInputs() {
-  const {
-    inputData,
-    errors,
-    formData,
-    handleChange,
-    handleBlur,
-    passwordVisibility,
-    handlePasswordVisibilityToggle,
-  } = useSignUpForm();
+interface SignUpInputsProps {
+  inputData: InputData[];
+  errors: Errors;
+  formData: FormData;
+  handleChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  handleBlur: (e: FocusEvent<HTMLInputElement>) => void;
+  handlePasswordVisibilityToggle: (
+    field: 'password' | 'confirmPassword',
+  ) => void;
+  passwordVisibility: {
+    password: boolean;
+    confirmPassword: boolean;
+  };
+  passwordRules: {
+    errorMessage: string;
+    rule: string;
+  }[];
+  failedPasswordRules: string[];
+  passwordValidation: ZodSafeParseResult<string>;
+  hasStartedTypingPassword: boolean;
+}
 
+export default function SignUpInputs({
+  inputData,
+  errors,
+  formData,
+  handleChange,
+  handleBlur,
+  handlePasswordVisibilityToggle,
+  passwordVisibility,
+  passwordRules,
+  failedPasswordRules,
+  passwordValidation,
+  hasStartedTypingPassword,
+}: SignUpInputsProps) {
   return (
     <ul className="mb-8 flex flex-col gap-6">
       {inputData.map(({ name, label, type }) => {
@@ -55,38 +82,30 @@ export default function SignUpInputs() {
 
             {isPasswordInput && (
               <>
-                <SignUpPasswordRules />
-
-                <button
-                  type="button"
-                  onClick={() => handlePasswordVisibilityToggle(name)}
-                  aria-controls={name}
-                  aria-label={
-                    passwordVisibility[name]
-                      ? `Hide ${label.toLowerCase()}.`
-                      : `Show ${label.toLowerCase()}.`
+                <SignUpPasswordRules
+                  passwordRules={passwordRules}
+                  passwordValidation={passwordValidation}
+                  failedPasswordRules={failedPasswordRules}
+                  hasStartedTypingPassword={hasStartedTypingPassword}
+                />
+                <ShowPasswordButton
+                  handlePasswordVisibilityToggle={
+                    handlePasswordVisibilityToggle
                   }
-                  className="text-heading-s text-medium-gray hover:bg-background hover:text-main-purple focus-visible:outline-main-purple focus-visible:text-main-purple absolute top-3 right-2 cursor-pointer rounded-full px-2 py-1 font-bold outline-transparent transition-colors focus-visible:outline-2 focus-visible:outline-offset-4"
-                >
-                  {passwordVisibility[name] ? 'Hide' : 'Show'}
-                </button>
+                  passwordVisibility={passwordVisibility}
+                  name={name}
+                  label={label}
+                />
               </>
             )}
 
             {isConfirmPasswordInput && (
-              <button
-                type="button"
-                onClick={() => handlePasswordVisibilityToggle(name)}
-                aria-controls={name}
-                aria-label={
-                  passwordVisibility[name]
-                    ? `Hide ${label.toLowerCase()}.`
-                    : `Show ${label.toLowerCase()}.`
-                }
-                className="text-heading-s text-medium-gray hover:bg-background hover:text-main-purple focus-visible:outline-main-purple focus-visible:text-main-purple absolute top-3 right-2 cursor-pointer rounded-full px-2 py-1 font-bold outline-transparent transition-colors focus-visible:outline-2 focus-visible:outline-offset-4"
-              >
-                {passwordVisibility[name] ? 'Hide' : 'Show'}
-              </button>
+              <ShowPasswordButton
+                handlePasswordVisibilityToggle={handlePasswordVisibilityToggle}
+                passwordVisibility={passwordVisibility}
+                name={name}
+                label={label}
+              />
             )}
           </li>
         );

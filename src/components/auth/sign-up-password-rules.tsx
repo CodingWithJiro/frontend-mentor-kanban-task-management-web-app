@@ -1,13 +1,21 @@
-import useSignUpForm from '@/hooks/use-sign-up-form';
+import type { ZodSafeParseResult } from 'zod';
 
-export default function SignUpPasswordRules() {
-  const {
-    passwordRules,
-    passwordValidation,
-    failedPasswordRules,
-    hasStartedTypingPassword,
-  } = useSignUpForm();
+interface SignUpPasswordRulesProps {
+  passwordRules: {
+    errorMessage: string;
+    rule: string;
+  }[];
+  passwordValidation: ZodSafeParseResult<string>;
+  failedPasswordRules: string[];
+  hasStartedTypingPassword: boolean;
+}
 
+export default function SignUpPasswordRules({
+  passwordRules,
+  passwordValidation,
+  failedPasswordRules,
+  hasStartedTypingPassword,
+}: SignUpPasswordRulesProps) {
   return (
     <ul
       id="password-error"
