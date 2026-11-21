@@ -1,17 +1,17 @@
-import type { Request, Response } from "express";
-import prisma from "../../src/lib/prisma.ts";
-import { generateAccessToken } from "../services/access-token.service.ts";
+import type { Request, Response } from 'express';
+import prisma from '../database/prisma.ts';
+import { generateAccessToken } from '../services/access-token.service.ts';
 import {
   getRefreshToken,
   getRefreshTokenHash,
   getRefreshTokenMaxAge,
   saveRefreshToken,
-} from "../services/refresh-token.service.ts";
+} from '../services/refresh-token.service.ts';
 import {
   clearRefreshTokenCookie,
   setRefreshTokenCookie,
-} from "../utils/cookies.ts";
-import { comparePassword, getPasswordHash } from "../utils/password.ts";
+} from '../utils/cookies.ts';
+import { comparePassword, getPasswordHash } from '../utils/password.ts';
 
 export async function registerAccount(req: Request, res: Response) {
   const { name, username, email, password } = req.body;
@@ -26,11 +26,11 @@ export async function registerAccount(req: Request, res: Response) {
   });
   const isUsernameAlreadyInUse = existingUser?.username === username;
   if (isUsernameAlreadyInUse) {
-    return res.status(409).json({ message: "Username is already in use." });
+    return res.status(409).json({ message: 'Username is already in use.' });
   }
   const isEmailAlreadyInUse = existingUser?.email === email;
   if (isEmailAlreadyInUse) {
-    return res.status(409).json({ message: "Email is already in use." });
+    return res.status(409).json({ message: 'Email is already in use.' });
   }
   const passwordHash = await getPasswordHash(password);
   const refreshToken = getRefreshToken();
@@ -63,18 +63,18 @@ export async function registerAccount(req: Request, res: Response) {
         username: user.username,
         email: user.email,
       },
-      message: "New user registered successfully.",
+      message: 'New user registered successfully.',
     });
   } catch (err) {
     const isPrismaDuplicateError =
-      typeof err === "object" &&
+      typeof err === 'object' &&
       err !== null &&
-      "code" in err &&
-      err.code === "P2002";
+      'code' in err &&
+      err.code === 'P2002';
     if (isPrismaDuplicateError) {
       return res
         .status(409)
-        .json({ message: "Username or email is already in use." });
+        .json({ message: 'Username or email is already in use.' });
     }
     throw err;
   }
@@ -86,11 +86,11 @@ export async function loginAccount(req: Request, res: Response) {
     (await prisma.user.findUnique({ where: { email: identifier } })) ??
     (await prisma.user.findUnique({ where: { username: identifier } }));
   if (!user) {
-    return res.status(401).json({ message: "Invalid credentials." });
+    return res.status(401).json({ message: 'Invalid credentials.' });
   }
   const isValidPassword = await comparePassword(password, user.passwordHash);
   if (!isValidPassword) {
-    return res.status(401).json({ message: "Invalid credentials." });
+    return res.status(401).json({ message: 'Invalid credentials.' });
   }
   const refreshToken = getRefreshToken();
   const refreshTokenMaxAge = getRefreshTokenMaxAge();
@@ -116,10 +116,10 @@ export async function loginAccount(req: Request, res: Response) {
 export async function refreshAccessToken(req: Request, res: Response) {
   const refreshToken = req.cookies.refreshToken;
   const isMissingRefreshToken =
-    typeof refreshToken !== "string" || !refreshToken;
+    typeof refreshToken !== 'string' || !refreshToken;
   if (isMissingRefreshToken) {
     clearRefreshTokenCookie(res);
-    return res.status(401).json({ message: "Refresh token is missing." });
+    return res.status(401).json({ message: 'Refresh token is missing.' });
   }
   const refreshTokenHash = getRefreshTokenHash(refreshToken);
   const storedRefreshToken = await prisma.refreshToken.findUnique({
@@ -133,7 +133,7 @@ export async function refreshAccessToken(req: Request, res: Response) {
     clearRefreshTokenCookie(res);
     return res
       .status(401)
-      .json({ message: "Invalid or expired refresh token." });
+      .json({ message: 'Invalid or expired refresh token.' });
   }
   const userId = storedRefreshToken.userId;
   const newRefreshToken = getRefreshToken();
@@ -164,19 +164,19 @@ export async function refreshAccessToken(req: Request, res: Response) {
     clearRefreshTokenCookie(res);
     return res
       .status(401)
-      .json({ message: "Invalid or expired refresh token." });
+      .json({ message: 'Invalid or expired refresh token.' });
   }
   const newAccessToken = await generateAccessToken(userId);
   setRefreshTokenCookie(res, newRefreshToken, newRefreshTokenMaxAge);
   return res.status(200).json({
-    message: "Access token refreshed successfully.",
+    message: 'Access token refreshed successfully.',
     accessToken: newAccessToken,
   });
 }
 
 export async function logoutAccount(req: Request, res: Response) {
   const refreshToken = req.cookies.refreshToken;
-  const isValidRefreshToken = typeof refreshToken === "string" && refreshToken;
+  const isValidRefreshToken = typeof refreshToken === 'string' && refreshToken;
   if (isValidRefreshToken) {
     const refreshTokenHash = getRefreshTokenHash(refreshToken);
     await prisma.refreshToken.updateMany({
@@ -188,5 +188,5 @@ export async function logoutAccount(req: Request, res: Response) {
     });
   }
   clearRefreshTokenCookie(res);
-  return res.status(200).json({ message: "Logged out successfully." });
+  return res.status(200).json({ message: 'Logged out successfully.' });
 }

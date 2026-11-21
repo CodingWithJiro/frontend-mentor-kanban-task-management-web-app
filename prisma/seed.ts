@@ -1,12 +1,12 @@
-import prisma from "../src/lib/prisma.ts";
+import prisma from '../server/database/prisma.ts';
 
 async function main() {
   const user = await prisma.user.create({
     data: {
-      name: "John Doe",
-      username: "johndoe123",
-      email: "johndoe@example.com",
-      passwordHash: "johndoepasswordhash",
+      name: 'John Doe',
+      username: 'johndoe123',
+      email: 'johndoe@example.com',
+      passwordHash: 'johndoepasswordhash',
       boards: {
         create: {
           name: "John Doe's Board",

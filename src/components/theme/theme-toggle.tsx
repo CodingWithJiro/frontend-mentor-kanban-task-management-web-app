@@ -1,13 +1,10 @@
 'use client';
 
 import Image from 'next/image';
-import { useTheme } from 'next-themes';
+import useThemeToggle from '@/hooks/use-theme-toggle';
 
 export default function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-
-  const nextTheme = theme === 'light' ? 'dark' : 'light';
-  const handleClick = () => setTheme(nextTheme);
+  const { handleClick, theme, nextTheme } = useThemeToggle();
 
   return (
     <div className="bg-background-theme-toggle flex h-12 w-full items-center justify-center gap-6 rounded-md transition-colors">

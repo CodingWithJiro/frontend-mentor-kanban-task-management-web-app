@@ -1,30 +1,30 @@
-import type { Request, Response } from "express";
-import prisma from "../../src/lib/prisma.ts";
-import { getNormalizedDescription } from "../utils/description.ts";
+import type { Request, Response } from 'express';
+import prisma from '../database/prisma.ts';
+import { getNormalizedDescription } from '../utils/description.ts';
 import {
   getBoardColumn,
   getColumnTask,
   getUserBoard,
-} from "../services/resource-access.service.ts";
+} from '../services/resource-access.service.ts';
 
 export async function getTasks(req: Request, res: Response) {
   const userId = req.userId!;
   const boardId = Number(req.params.boardId);
   const board = await getUserBoard(userId, boardId);
   if (!board) {
-    return res.status(404).json({ message: "Board not found." });
+    return res.status(404).json({ message: 'Board not found.' });
   }
   const columnId = Number(req.params.columnId);
   const column = await getBoardColumn(boardId, columnId);
   if (!column) {
-    return res.status(404).json({ message: "Column not found." });
+    return res.status(404).json({ message: 'Column not found.' });
   }
   const tasks = await prisma.task.findMany({
     where: { columnId },
-    orderBy: { position: "asc" },
+    orderBy: { position: 'asc' },
   });
   return res.status(200).json({
-    message: "Tasks retrieved successfully.",
+    message: 'Tasks retrieved successfully.',
     tasks,
   });
 }
@@ -34,20 +34,20 @@ export async function getTask(req: Request, res: Response) {
   const boardId = Number(req.params.boardId);
   const board = await getUserBoard(userId, boardId);
   if (!board) {
-    return res.status(404).json({ message: "Board not found." });
+    return res.status(404).json({ message: 'Board not found.' });
   }
   const columnId = Number(req.params.columnId);
   const column = await getBoardColumn(boardId, columnId);
   if (!column) {
-    return res.status(404).json({ message: "Column not found." });
+    return res.status(404).json({ message: 'Column not found.' });
   }
   const taskId = Number(req.params.taskId);
   const task = await getColumnTask(columnId, taskId);
   if (!task) {
-    return res.status(404).json({ message: "Task not found." });
+    return res.status(404).json({ message: 'Task not found.' });
   }
   return res.status(200).json({
-    message: "Task retrieved successfully.",
+    message: 'Task retrieved successfully.',
     task,
   });
 }
@@ -59,16 +59,16 @@ export async function createTask(req: Request, res: Response) {
   const boardId = Number(req.params.boardId);
   const board = await getUserBoard(userId, boardId);
   if (!board) {
-    return res.status(404).json({ message: "Board not found." });
+    return res.status(404).json({ message: 'Board not found.' });
   }
   const columnId = Number(req.params.columnId);
   const column = await getBoardColumn(boardId, columnId);
   if (!column) {
-    return res.status(404).json({ message: "Column not found." });
+    return res.status(404).json({ message: 'Column not found.' });
   }
   const lastTask = await prisma.task.findFirst({
     where: { columnId },
-    orderBy: { position: "desc" },
+    orderBy: { position: 'desc' },
     select: { position: true },
   });
   const position = lastTask ? lastTask.position + 1 : 1;
@@ -81,7 +81,7 @@ export async function createTask(req: Request, res: Response) {
     },
   });
   return res.status(201).json({
-    message: "Task created successfully.",
+    message: 'Task created successfully.',
     task,
   });
 }
@@ -93,17 +93,17 @@ export async function updateTask(req: Request, res: Response) {
   const boardId = Number(req.params.boardId);
   const board = await getUserBoard(userId, boardId);
   if (!board) {
-    return res.status(404).json({ message: "Board not found." });
+    return res.status(404).json({ message: 'Board not found.' });
   }
   const columnId = Number(req.params.columnId);
   const column = await getBoardColumn(boardId, columnId);
   if (!column) {
-    return res.status(404).json({ message: "Column not found." });
+    return res.status(404).json({ message: 'Column not found.' });
   }
   const taskId = Number(req.params.taskId);
   const task = await getColumnTask(columnId, taskId);
   if (!task) {
-    return res.status(404).json({ message: "Task not found." });
+    return res.status(404).json({ message: 'Task not found.' });
   }
   const updatedTask = await prisma.task.update({
     where: { id: taskId },
@@ -113,7 +113,7 @@ export async function updateTask(req: Request, res: Response) {
     },
   });
   return res.status(200).json({
-    message: "Task updated successfully.",
+    message: 'Task updated successfully.',
     task: updatedTask,
   });
 }
@@ -123,18 +123,18 @@ export async function deleteTask(req: Request, res: Response) {
   const boardId = Number(req.params.boardId);
   const board = await getUserBoard(userId, boardId);
   if (!board) {
-    return res.status(404).json({ message: "Board not found." });
+    return res.status(404).json({ message: 'Board not found.' });
   }
   const columnId = Number(req.params.columnId);
   const column = await getBoardColumn(boardId, columnId);
   if (!column) {
-    return res.status(404).json({ message: "Column not found." });
+    return res.status(404).json({ message: 'Column not found.' });
   }
   const taskId = Number(req.params.taskId);
   const existingTask = await getColumnTask(columnId, taskId);
   if (!existingTask) {
-    return res.status(404).json({ message: "Task not found." });
+    return res.status(404).json({ message: 'Task not found.' });
   }
   await prisma.task.delete({ where: { id: taskId } });
-  return res.status(200).json({ message: "Task successfully deleted." });
+  return res.status(200).json({ message: 'Task successfully deleted.' });
 }
