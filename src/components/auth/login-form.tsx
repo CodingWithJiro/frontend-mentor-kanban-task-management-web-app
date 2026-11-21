@@ -1,6 +1,12 @@
+'use client';
+
+import useLoginForm from '@/hooks/use-login-form';
 import LoginHeader from './login-header';
+import LoginInputs from './login-inputs';
 
 export default function LoginForm() {
+  const { inputData, formData, handleChange } = useLoginForm();
+
   return (
     <form
       className="bg-background-form drop-shadow-form w-full max-w-120 rounded-lg p-6 transition-colors"
@@ -8,6 +14,11 @@ export default function LoginForm() {
       noValidate
     >
       <LoginHeader />
+      <LoginInputs
+        inputData={inputData}
+        formData={formData}
+        handleChange={handleChange}
+      />
     </form>
   );
 }
