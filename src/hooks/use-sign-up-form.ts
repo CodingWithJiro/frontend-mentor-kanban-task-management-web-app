@@ -73,10 +73,7 @@ export default function useSignUpForm() {
     const isStillInputError = !result.success;
     const errorMessage = result.error?.issues[0].message;
     setErrors((prev) => {
-      return {
-        ...prev,
-        [field]: isStillInputError ? errorMessage : undefined,
-      };
+      return { ...prev, [field]: isStillInputError ? errorMessage : undefined };
     });
   };
 

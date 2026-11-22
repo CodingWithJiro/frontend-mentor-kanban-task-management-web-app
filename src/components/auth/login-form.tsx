@@ -14,6 +14,10 @@ export default function LoginForm() {
     passwordVisibility,
     handlePasswordVisibilityToggle,
     handleSubmit,
+    handleBlur,
+    isSubmitting,
+    serverError,
+    errors,
   } = useLoginForm();
 
   return (
@@ -30,8 +34,13 @@ export default function LoginForm() {
         handleChange={handleChange}
         passwordVisibility={passwordVisibility}
         handlePasswordVisibilityToggle={handlePasswordVisibilityToggle}
+        handleBlur={handleBlur}
+        errors={errors}
       />
-      <LoginAccountButton />
+      <LoginAccountButton
+        isSubmitting={isSubmitting}
+        serverError={serverError}
+      />
       <ThemeToggle />
     </form>
   );
