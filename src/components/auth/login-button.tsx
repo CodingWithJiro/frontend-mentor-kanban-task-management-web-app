@@ -21,7 +21,7 @@ export default function LoginButton() {
         <path d="M9 2H3.5A1.5 1.5 0 0 0 2 3.5v9A1.5 1.5 0 0 0 3.5 14H9" />
         <path d="M7 8h7m-3-3 3 3-3 3" />
       </svg>
-      <span>Login</span>
+      <span>Log In</span>
     </Link>
   );
 }
