@@ -10,3 +10,5 @@ export interface InputData {
   label: string;
   type: string;
 }
+
+export type Errors = Partial<Record<FormField, string>>;
