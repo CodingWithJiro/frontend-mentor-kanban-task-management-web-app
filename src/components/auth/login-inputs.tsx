@@ -1,4 +1,4 @@
-import type { FormData, InputData } from '@/types/login-form-type';
+import type { FormData, InputData } from '@/types/login-form.type';
 import type { ChangeEvent } from 'react';
 import ShowPasswordButton from './show-password-button';
 

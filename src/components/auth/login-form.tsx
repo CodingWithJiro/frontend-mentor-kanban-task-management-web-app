@@ -3,6 +3,7 @@
 import useLoginForm from '@/hooks/use-login-form';
 import LoginHeader from './login-header';
 import LoginInputs from './login-inputs';
+import LoginAccountButton from './login-account-button';
 
 export default function LoginForm() {
   const {
@@ -11,12 +12,14 @@ export default function LoginForm() {
     handleChange,
     passwordVisibility,
     handlePasswordVisibilityToggle,
+    handleSubmit,
   } = useLoginForm();
 
   return (
     <form
       className="bg-background-form drop-shadow-form w-full max-w-120 rounded-lg p-6 transition-colors"
       aria-labelledby="login-heading"
+      onSubmit={handleSubmit}
       noValidate
     >
       <LoginHeader />
@@ -27,6 +30,7 @@ export default function LoginForm() {
         passwordVisibility={passwordVisibility}
         handlePasswordVisibilityToggle={handlePasswordVisibilityToggle}
       />
+      <LoginAccountButton />
     </form>
   );
 }
