@@ -4,6 +4,7 @@ import useLoginForm from '@/hooks/use-login-form';
 import LoginHeader from './login-header';
 import LoginInputs from './login-inputs';
 import LoginAccountButton from './login-account-button';
+import ThemeToggle from '../theme/theme-toggle';
 
 export default function LoginForm() {
   const {
@@ -31,6 +32,7 @@ export default function LoginForm() {
         handlePasswordVisibilityToggle={handlePasswordVisibilityToggle}
       />
       <LoginAccountButton />
+      <ThemeToggle />
     </form>
   );
 }
