@@ -1,20 +1,26 @@
 import type { FormData, InputData } from '@/types/login-form-type';
 import type { ChangeEvent } from 'react';
+import ShowPasswordButton from './show-password-button';
 
 interface LoginInputsProps {
   inputData: InputData[];
   formData: FormData;
   handleChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  passwordVisibility: { password: boolean };
+  handlePasswordVisibilityToggle: (field: 'password') => void;
 }
 
 export default function LoginInputs({
   inputData,
   formData,
   handleChange,
+  passwordVisibility,
+  handlePasswordVisibilityToggle,
 }: LoginInputsProps) {
   return (
     <ul className="mb-8 flex flex-col gap-6">
       {inputData.map(({ name, label, type }) => {
+        const isPasswordInput = name === 'password';
         return (
           <li key={name} className="relative">
             <input
@@ -34,6 +40,17 @@ export default function LoginInputs({
             >
               {label}
             </label>
+
+            {isPasswordInput && (
+              <ShowPasswordButton
+                name={name}
+                label={label}
+                passwordVisibility={passwordVisibility}
+                handlePasswordVisibilityToggle={() =>
+                  handlePasswordVisibilityToggle('password')
+                }
+              />
+            )}
 
             {true && (
               <p

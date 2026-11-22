@@ -6,7 +6,7 @@ interface ShowPasswordButtonProps {
   ) => void;
   passwordVisibility: {
     password: boolean;
-    confirmPassword: boolean;
+    confirmPassword?: boolean;
   };
 }
 

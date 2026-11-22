@@ -5,7 +5,13 @@ import LoginHeader from './login-header';
 import LoginInputs from './login-inputs';
 
 export default function LoginForm() {
-  const { inputData, formData, handleChange } = useLoginForm();
+  const {
+    inputData,
+    formData,
+    handleChange,
+    passwordVisibility,
+    handlePasswordVisibilityToggle,
+  } = useLoginForm();
 
   return (
     <form
@@ -18,6 +24,8 @@ export default function LoginForm() {
         inputData={inputData}
         formData={formData}
         handleChange={handleChange}
+        passwordVisibility={passwordVisibility}
+        handlePasswordVisibilityToggle={handlePasswordVisibilityToggle}
       />
     </form>
   );

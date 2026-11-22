@@ -8,11 +8,16 @@ export default function useLoginForm() {
     identifier: '',
     password: '',
   });
-  const [showPassword, setShowPassword] = useState(false);
+  const [passwordVisibility, setPasswordVisibility] = useState({
+    password: false,
+  });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+  const handlePasswordVisibilityToggle = (field: 'password') => {
+    setPasswordVisibility((prev) => ({ ...prev, [field]: !prev[field] }));
   };
 
   const inputData: InputData[] = [
@@ -20,9 +25,15 @@ export default function useLoginForm() {
     {
       name: 'password',
       label: 'Password',
-      type: `${showPassword ? 'text' : 'password'}`,
+      type: `${passwordVisibility.password ? 'text' : 'password'}`,
     },
   ];
 
-  return { formData, inputData, handleChange };
+  return {
+    formData,
+    inputData,
+    handleChange,
+    passwordVisibility,
+    handlePasswordVisibilityToggle,
+  };
 }
