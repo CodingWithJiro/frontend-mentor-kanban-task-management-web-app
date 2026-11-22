@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { validateRequest } from '../middlewares/validate-request.ts';
 import { registerSchema } from '../../shared/schemas/register.schema.ts';
-import { loginSchema } from '../schemas/login.schema.ts';
+import { loginSchema } from '../../shared/schemas/login.schema.ts';
 import {
   loginAccount,
   logoutAccount,
