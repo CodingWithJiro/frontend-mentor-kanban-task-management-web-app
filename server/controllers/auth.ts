@@ -103,6 +103,7 @@ export async function loginAccount(req: Request, res: Response) {
   const accessToken = await generateAccessToken(user.id);
   setRefreshTokenCookie(res, refreshToken, refreshTokenMaxAge);
   return res.status(200).json({
+    message: 'Login successful.',
     accessToken,
     user: {
       id: user.id,
