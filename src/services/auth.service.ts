@@ -1,10 +1,5 @@
-import { registerSchema } from '../../shared/schemas/register.schema';
-import { loginSchema } from '../../shared/schemas/login.schema';
+import type { LoginInput, RegisterInput } from '@/types/auth.type';
 import { API_URL } from '@/config/env';
-import { z } from 'zod';
-
-type RegisterInput = z.infer<typeof registerSchema>;
-type LoginInput = z.infer<typeof loginSchema>;
 
 export async function registerAccount(userData: RegisterInput) {
   const response = await fetch(`${API_URL}/api/auth/register`, {
