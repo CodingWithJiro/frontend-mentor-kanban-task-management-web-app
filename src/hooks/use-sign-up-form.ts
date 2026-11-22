@@ -1,11 +1,11 @@
 import type { ChangeEvent, FocusEvent, SubmitEvent } from 'react';
 import type { ZodSafeParseResult } from 'zod';
+import type { AuthResponse } from '@/types/auth.type';
 import type {
   Errors,
   FormData,
   FormField,
   InputData,
-  RegisterResponse,
 } from '@/types/sign-up-form.type';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -186,9 +186,7 @@ export default function useSignUpForm() {
     }
     try {
       setIsSubmitting(true);
-      const result: RegisterResponse = await registerAccount(
-        validationResult.data,
-      );
+      const result: AuthResponse = await registerAccount(validationResult.data);
       setSuccessMessage(result.message);
       updateAuth(result.accessToken, result.user);
       router.push('/');
