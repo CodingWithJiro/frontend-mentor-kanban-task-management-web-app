@@ -34,7 +34,7 @@ export default function BoardThemeSwitcherModal({
         </div>
         <hr className="bg-medium-gray/30 mx-auto mt-2 mb-3.5 h-px border-0" />
         <div className="-ml-6 flex flex-col">
-          {user ? <LogoutButton /> : <LoginButton />}
+          {user ? <LogoutButton onClose={onClose} /> : <LoginButton />}
           <SignUpButton />
         </div>
       </section>
