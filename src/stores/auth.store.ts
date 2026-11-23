@@ -4,7 +4,7 @@ import { create } from 'zustand';
 interface AuthStore {
   accessToken: string | null;
   user: AuthUser | null;
-  updateAuth: (accessToken: string, user: AuthUser) => void;
+  updateAuth: (accessToken: string | null, user: AuthUser | null) => void;
 }
 
 export const useAuthStore = create<AuthStore>((set) => ({
