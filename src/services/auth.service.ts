@@ -32,3 +32,14 @@ export async function loginAccount(userData: LoginInput) {
   }
   return result;
 }
+
+export async function logoutAccount() {
+  const response = await fetch(`${API_URL}/api/auth/logout`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message);
+  }
+}
