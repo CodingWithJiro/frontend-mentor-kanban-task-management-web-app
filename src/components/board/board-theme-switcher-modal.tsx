@@ -23,7 +23,6 @@ export default function BoardThemeSwitcherModal({
     <dialog
       className="bg-background-modal fixed top-20 left-1/2 w-66 -translate-x-1/2 rounded-lg p-4 transition-colors backdrop:bg-transparent"
       ref={dialogRef}
-      onClose={onClose}
       closedby="any"
     >
       <CloseButton onClick={onClose} />
