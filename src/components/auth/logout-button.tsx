@@ -9,6 +9,7 @@ export default function LogoutButton() {
     confirmDialogRef,
     handleOpenConfirmModal,
     handleCloseConfirmModal,
+    isLoggingOut,
   } = useLogoutButton();
 
   return (
@@ -40,6 +41,7 @@ export default function LogoutButton() {
         confirmDialogRef={confirmDialogRef}
         onLogout={handleLogout}
         onCancel={handleCloseConfirmModal}
+        isLoggingOut={isLoggingOut}
       />
     </>
   );

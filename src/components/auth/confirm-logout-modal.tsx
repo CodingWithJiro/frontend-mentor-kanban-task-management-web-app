@@ -5,12 +5,14 @@ interface ConfirmLogoutModalProps {
   confirmDialogRef: Ref<HTMLDialogElement | null>;
   onLogout: () => void;
   onCancel: () => void;
+  isLoggingOut: boolean;
 }
 
 export default function ConfirmLogoutModal({
   confirmDialogRef,
   onLogout,
   onCancel,
+  isLoggingOut,
 }: ConfirmLogoutModalProps) {
   const user = useAuthStore((state) => state.user);
 
@@ -27,11 +29,17 @@ export default function ConfirmLogoutModal({
       </p>
       <div className="flex flex-col items-center justify-center gap-4">
         <button
-          className="text-body-l bg-main-purple hover:bg-main-purple-hover focus-visible:outline-main-purple w-full cursor-pointer rounded-[20px] px-4 py-2 font-bold text-white outline-offset-4 outline-transparent transition-colors focus-visible:outline-2"
+          className={`text-body-l ${
+            isLoggingOut
+              ? 'bg-medium-gray hover:bg-medium-gray cursor-not-allowed'
+              : 'bg-main-purple hover:bg-main-purple-hover cursor-pointer'
+          } focus-visible:outline-main-purple w-full rounded-[20px] px-4 py-2 font-bold text-white outline-offset-4 outline-transparent transition-colors focus-visible:outline-2`}
           type="button"
           onClick={onLogout}
+          aria-busy={isLoggingOut}
+          disabled={isLoggingOut}
         >
-          Log out
+          {isLoggingOut ? 'Logging out...' : 'Log Out'}
         </button>
         <button
           className="text-body-l text-main-purple bg-background-button-secondary hover:bg-background-button-secondary-hover focus-visible:outline-main-purple w-full cursor-pointer rounded-[20px] px-4 py-2 font-bold outline-offset-4 outline-transparent transition-colors focus-visible:outline-2"

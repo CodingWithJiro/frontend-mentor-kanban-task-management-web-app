@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 
 export default function useLogoutButton() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const updateAuth = useAuthStore((state) => state.updateAuth);
   const confirmDialogRef = useRef<HTMLDialogElement>(null);
   const router = useRouter();
@@ -26,6 +27,7 @@ export default function useLogoutButton() {
     setIsOpen(false);
   };
   const handleLogout = async () => {
+    setIsLoggingOut(true);
     await logoutAccount();
     updateAuth(null, null);
     setIsOpen(false);
@@ -37,5 +39,6 @@ export default function useLogoutButton() {
     confirmDialogRef,
     handleOpenConfirmModal,
     handleCloseConfirmModal,
+    isLoggingOut,
   };
 }
