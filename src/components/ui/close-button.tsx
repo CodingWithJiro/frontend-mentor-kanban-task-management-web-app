@@ -1,7 +1,7 @@
 export default function CloseButton({ onClick }: { onClick: () => void }) {
   return (
     <button
-      className="text-medium-gray focus-visible:outline-main-purple focus-visible:text-main-purple hover:text-main-purple absolute top-0 right-0 scale-75 rounded-full p-4 outline-transparent transition-colors focus-visible:outline-2"
+      className="text-medium-gray focus-visible:outline-main-purple focus-visible:text-main-purple hover:text-main-purple absolute top-0 right-0 scale-75 cursor-pointer rounded-full p-4 outline-transparent transition-colors focus-visible:outline-2"
       type="button"
       onClick={onClick}
     >

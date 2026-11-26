@@ -1,23 +1,34 @@
 import { logoutAccount } from '@/services/auth.service';
 import { useAuthStore } from '@/stores/auth.store';
 import { useRouter } from 'next/navigation';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function useLogoutButton() {
+  const [isOpen, setIsOpen] = useState(false);
   const updateAuth = useAuthStore((state) => state.updateAuth);
-  const router = useRouter();
   const confirmDialogRef = useRef<HTMLDialogElement>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const dialog = confirmDialogRef.current;
+    if (!dialog) return;
+    if (isOpen && !dialog.open) {
+      dialog.showModal();
+    } else if (!isOpen && dialog.open) {
+      dialog.close();
+    }
+  }, [isOpen]);
 
   const handleOpenConfirmModal = () => {
-    if (confirmDialogRef.current?.open) return;
-    confirmDialogRef.current?.showModal();
+    setIsOpen(true);
   };
   const handleCloseConfirmModal = () => {
-    confirmDialogRef.current?.close();
+    setIsOpen(false);
   };
   const handleLogout = async () => {
     await logoutAccount();
     updateAuth(null, null);
+    setIsOpen(false);
     router.push('/');
   };
 

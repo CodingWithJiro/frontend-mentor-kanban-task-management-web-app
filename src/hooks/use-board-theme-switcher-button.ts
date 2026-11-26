@@ -1,18 +1,30 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 export default function useBoardThemeSwitcherButton() {
   const [isOpen, setIsOpen] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
 
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (isOpen && !dialog.open) {
+      dialog.showModal();
+    } else if (!isOpen && dialog.open) {
+      dialog.close();
+    }
+  }, [isOpen]);
+
   const handleOpenModal = () => {
-    if (dialogRef.current?.open) return;
-    dialogRef.current?.showModal();
     setIsOpen(true);
   };
   const handleCloseModal = () => {
-    dialogRef.current?.close();
     setIsOpen(false);
   };
 
-  return { isOpen, dialogRef, handleCloseModal, handleOpenModal };
+  return {
+    isOpen,
+    dialogRef,
+    handleCloseModal,
+    handleOpenModal,
+  };
 }

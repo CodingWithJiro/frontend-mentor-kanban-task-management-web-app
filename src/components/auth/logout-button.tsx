@@ -3,26 +3,13 @@
 import useLogoutButton from '@/hooks/use-logout-button';
 import ConfirmLogoutModal from './confirm-logout-modal';
 
-interface LogoutButtonProps {
-  onClose: () => void;
-}
-
-export default function LogoutButton({ onClose }: LogoutButtonProps) {
+export default function LogoutButton() {
   const {
     handleLogout,
     confirmDialogRef,
     handleOpenConfirmModal,
     handleCloseConfirmModal,
   } = useLogoutButton();
-
-  const handleConfirm = async () => {
-    await handleLogout();
-    handleCloseConfirmModal();
-    onClose();
-  };
-  const handleCancel = () => {
-    handleCloseConfirmModal();
-  };
 
   return (
     <>
@@ -51,8 +38,8 @@ export default function LogoutButton({ onClose }: LogoutButtonProps) {
       </button>
       <ConfirmLogoutModal
         confirmDialogRef={confirmDialogRef}
-        onConfirm={handleConfirm}
-        onCancel={handleCancel}
+        onLogout={handleLogout}
+        onCancel={handleCloseConfirmModal}
       />
     </>
   );

@@ -23,7 +23,7 @@ export default function BoardThemeSwitcherModal({
     <dialog
       className="bg-background-modal fixed top-20 left-1/2 w-66 -translate-x-1/2 rounded-lg p-4 transition-colors backdrop:bg-transparent"
       ref={dialogRef}
-      closedby="any"
+      closedby="none"
     >
       <CloseButton onClick={onClose} />
       <section className="mb-4 px-2">
@@ -33,7 +33,7 @@ export default function BoardThemeSwitcherModal({
         </div>
         <hr className="bg-medium-gray/30 mx-auto mt-2 mb-3.5 h-px border-0" />
         <div className="-ml-6 flex flex-col">
-          {user ? <LogoutButton onClose={onClose} /> : <LoginButton />}
+          {user ? <LogoutButton /> : <LoginButton />}
           <SignUpButton />
         </div>
       </section>
