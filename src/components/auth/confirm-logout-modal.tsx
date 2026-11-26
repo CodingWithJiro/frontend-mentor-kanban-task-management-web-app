@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/stores/auth.store';
 import { Ref } from 'react';
 
 interface ConfirmLogoutModalProps {
@@ -11,20 +12,33 @@ export default function ConfirmLogoutModal({
   onLogout,
   onCancel,
 }: ConfirmLogoutModalProps) {
+  const user = useAuthStore((state) => state.user);
+
   return (
     <dialog
-      className="bg-background-modal fixed top-1/2 left-1/2 w-78 -translate-x-1/2 -translate-y-1/2 rounded-lg p-4 transition-colors backdrop:bg-black/75"
+      className="bg-background-modal fixed top-1/2 left-1/2 w-[calc(100%-2rem)] max-w-90 -translate-x-1/2 -translate-y-1/2 rounded-md p-6 transition-colors backdrop:bg-black/75"
       ref={confirmDialogRef}
       closedby="none"
     >
-      <p>Are you sure you want to log out?</p>
-
-      <div className="flex justify-end gap-4">
-        <button type="button" onClick={onCancel}>
-          Cancel
-        </button>
-        <button type="button" onClick={onLogout}>
+      <h2 className="text-heading-l mb-6 font-bold">Log out?</h2>
+      <p className="text-body-l text-medium-gray mb-6 font-medium">
+        Are you sure you want to log out
+        <span className="text-main-purple">{` @${user?.username}`}</span>?
+      </p>
+      <div className="flex flex-col items-center justify-center gap-4">
+        <button
+          className="text-body-l bg-main-purple hover:bg-main-purple-hover focus-visible:outline-main-purple w-full cursor-pointer rounded-[20px] px-4 py-2 font-bold text-white outline-offset-4 outline-transparent transition-colors focus-visible:outline-2"
+          type="button"
+          onClick={onLogout}
+        >
           Log out
+        </button>
+        <button
+          className="text-body-l text-main-purple bg-background-button-secondary hover:bg-background-button-secondary-hover focus-visible:outline-main-purple w-full cursor-pointer rounded-[20px] px-4 py-2 font-bold outline-offset-4 outline-transparent transition-colors focus-visible:outline-2"
+          type="button"
+          onClick={onCancel}
+        >
+          Cancel
         </button>
       </div>
     </dialog>

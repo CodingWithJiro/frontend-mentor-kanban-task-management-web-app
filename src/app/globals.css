@@ -12,6 +12,8 @@
   --background-theme-toggle: #f4f7fd;
   --background-board-item-hover: #6460c71a;
   --background-board-actions-menu: #ffffff;
+  --background-button-secondary: #635fc71a;
+  --background-button-secondary-hover: #635fc740;
 }
 
 .dark {
@@ -24,6 +26,8 @@
   --background-theme-toggle: #20212c;
   --background-board-item-hover: #ffffff;
   --background-board-actions-menu: #20212c;
+  --background-button-secondary: #ffffff;
+  --background-button-secondary-hover: #ffffff;
 }
 
 @theme inline {
@@ -36,6 +40,10 @@
   --color-background-theme-toggle: var(--background-theme-toggle);
   --color-background-board-item-hover: var(--background-board-item-hover);
   --color-background-board-actions-menu: var(--background-board-actions-menu);
+  --color-background-button-secondary: var(--background-button-secondary);
+  --color-background-button-secondary-hover: var(
+    --background-button-secondary-hover
+  );
   --font-sans: var(--font-plus-jakarta-sans);
   --color-main-purple: #635fc7;
   --color-main-purple-hover: #a8a4ff;
