@@ -30,7 +30,7 @@ export default function LoginInputs({
         return (
           <li key={name} className="relative">
             <input
-              className={`peer text-body-l outline-medium-gray/25 ${isError ? 'hover:outline-red focus-visible:outline-red outline-red' : 'hover:outline-main-purple focus-visible:outline-main-purple'} w-full rounded-sm px-4 py-3 font-medium placeholder-transparent outline-2 transition-colors`}
+              className={`peer text-body-l outline-medium-gray/25 ${isError ? 'hover:outline-red focus-visible:outline-red outline-red' : 'hover:outline-main-purple focus-visible:outline-main-purple'} w-full rounded-sm px-4 ${isPasswordInput && 'pr-15'} py-3 font-medium placeholder-transparent outline-2 transition-colors`}
               id={name}
               name={name}
               type={type}

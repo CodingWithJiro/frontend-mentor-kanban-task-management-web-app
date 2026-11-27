@@ -51,7 +51,7 @@ export default function SignUpInputs({
         return (
           <li key={name} className="relative">
             <input
-              className={`peer text-body-l outline-medium-gray/25 w-full rounded-sm px-4 py-3 font-medium placeholder-transparent outline-2 transition-colors ${isError ? 'hover:outline-red focus-visible:outline-red outline-red' : 'hover:outline-main-purple focus-visible:outline-main-purple'}`}
+              className={`peer text-body-l outline-medium-gray/25 w-full rounded-sm px-4 py-3 ${(isPasswordInput || isConfirmPasswordInput) && 'pr-15'} font-medium placeholder-transparent outline-2 transition-colors ${isError ? 'hover:outline-red focus-visible:outline-red outline-red' : 'hover:outline-main-purple focus-visible:outline-main-purple'}`}
               id={name}
               name={name}
               type={type}
