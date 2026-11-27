@@ -8,9 +8,12 @@
   --background-navbar: #ffffff;
   --background-mobile-dropdown: #635fc71a;
   --background-modal: #ffffff;
+  --background-form: #ffffff;
   --background-theme-toggle: #f4f7fd;
   --background-board-item-hover: #6460c71a;
   --background-board-actions-menu: #ffffff;
+  --background-button-secondary: #635fc71a;
+  --background-button-secondary-hover: #635fc740;
 }
 
 .dark {
@@ -19,9 +22,12 @@
   --background-navbar: #2b2c37;
   --background-mobile-dropdown: #3e3f4e;
   --background-modal: #2b2c37;
+  --background-form: #2b2c37;
   --background-theme-toggle: #20212c;
   --background-board-item-hover: #ffffff;
   --background-board-actions-menu: #20212c;
+  --background-button-secondary: #ffffff;
+  --background-button-secondary-hover: #ffffff;
 }
 
 @theme inline {
@@ -30,9 +36,14 @@
   --color-background-navbar: var(--background-navbar);
   --color-background-mobile-dropdown: var(--background-mobile-dropdown);
   --color-background-modal: var(--background-modal);
+  --color-background-form: var(--background-form);
   --color-background-theme-toggle: var(--background-theme-toggle);
   --color-background-board-item-hover: var(--background-board-item-hover);
   --color-background-board-actions-menu: var(--background-board-actions-menu);
+  --color-background-button-secondary: var(--background-button-secondary);
+  --color-background-button-secondary-hover: var(
+    --background-button-secondary-hover
+  );
   --font-sans: var(--font-plus-jakarta-sans);
   --color-main-purple: #635fc7;
   --color-main-purple-hover: #a8a4ff;
@@ -61,6 +72,7 @@
   --text-body-m--line-height: 0.9375rem;
   --breakpoint-xs: 375px;
   --drop-shadow-board-actions-menu: 0 10px 20px #364e7e40;
+  --drop-shadow-form: 0 10px 20px #364e7e40;
 }
 
 @utility custom-scrollbar {

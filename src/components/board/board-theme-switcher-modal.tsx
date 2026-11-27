@@ -1,10 +1,13 @@
 import type { Ref } from 'react';
+import { useAuthStore } from '@/stores/auth.store';
 import ThemeToggle from '../theme/theme-toggle';
 import CloseButton from '../ui/close-button';
 import CreateNewBoardButton from './create-new-board-button';
 import AllBoardList from './all-board-list';
 import LoginButton from '../auth/login-button';
 import SignUpButton from '../auth/sign-up-button';
+import LogoutButton from '../auth/logout-button';
+import SwitchAccountButton from '../auth/switch-account-button';
 
 interface BoardThemeSwitcherModalProps {
   onClose: () => void;
@@ -15,12 +18,13 @@ export default function BoardThemeSwitcherModal({
   onClose,
   dialogRef,
 }: BoardThemeSwitcherModalProps) {
+  const user = useAuthStore((state) => state.user);
+
   return (
     <dialog
       className="bg-background-modal fixed top-20 left-1/2 w-66 -translate-x-1/2 rounded-lg p-4 transition-colors backdrop:bg-transparent"
       ref={dialogRef}
-      onClose={onClose}
-      closedby="any"
+      closedby="none"
     >
       <CloseButton onClick={onClose} />
       <section className="mb-4 px-2">
@@ -30,8 +34,8 @@ export default function BoardThemeSwitcherModal({
         </div>
         <hr className="bg-medium-gray/30 mx-auto mt-2 mb-3.5 h-px border-0" />
         <div className="-ml-6 flex flex-col">
-          <LoginButton />
-          <SignUpButton />
+          {user ? <LogoutButton /> : <LoginButton />}
+          {user ? <SwitchAccountButton /> : <SignUpButton />}
         </div>
       </section>
       <ThemeToggle />

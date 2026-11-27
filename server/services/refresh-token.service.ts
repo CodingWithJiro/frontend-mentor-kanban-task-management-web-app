@@ -1,18 +1,18 @@
-import type { Prisma } from "../../generated/prisma/client.ts";
-import type { StringValue } from "ms";
-import ms from "ms";
-import { createHash, randomBytes } from "node:crypto";
-import { REFRESH_TOKEN_EXPIRES_IN } from "../config/env.ts";
-import prisma from "../../src/lib/prisma.ts";
+import type { Prisma } from '../../generated/prisma/client.ts';
+import type { StringValue } from 'ms';
+import ms from 'ms';
+import { createHash, randomBytes } from 'node:crypto';
+import { REFRESH_TOKEN_EXPIRES_IN } from '../config/env.ts';
+import prisma from '../database/prisma.ts';
 
 type PrismaClientOrTransaction = typeof prisma | Prisma.TransactionClient;
 
 export function getRefreshToken() {
-  return randomBytes(32).toString("hex");
+  return randomBytes(32).toString('hex');
 }
 
 export function getRefreshTokenHash(refreshToken: string) {
-  return createHash("sha256").update(refreshToken).digest("hex");
+  return createHash('sha256').update(refreshToken).digest('hex');
 }
 
 export function getRefreshTokenMaxAge() {
