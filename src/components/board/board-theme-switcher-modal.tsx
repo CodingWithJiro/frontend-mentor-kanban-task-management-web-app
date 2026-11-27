@@ -7,6 +7,7 @@ import AllBoardList from './all-board-list';
 import LoginButton from '../auth/login-button';
 import SignUpButton from '../auth/sign-up-button';
 import LogoutButton from '../auth/logout-button';
+import SwitchAccountButton from '../auth/switch-account-button';
 
 interface BoardThemeSwitcherModalProps {
   onClose: () => void;
@@ -34,7 +35,7 @@ export default function BoardThemeSwitcherModal({
         <hr className="bg-medium-gray/30 mx-auto mt-2 mb-3.5 h-px border-0" />
         <div className="-ml-6 flex flex-col">
           {user ? <LogoutButton /> : <LoginButton />}
-          <SignUpButton />
+          {user ? <SwitchAccountButton /> : <SignUpButton />}
         </div>
       </section>
       <ThemeToggle />
