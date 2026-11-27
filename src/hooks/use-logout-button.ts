@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 export default function useLogoutButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const updateAuth = useAuthStore((state) => state.updateAuth);
   const confirmDialogRef = useRef<HTMLDialogElement>(null);
   const router = useRouter();
@@ -21,17 +22,26 @@ export default function useLogoutButton() {
   }, [isOpen]);
 
   const handleOpenConfirmModal = () => {
+    setErrorMessage(null);
     setIsOpen(true);
   };
   const handleCloseConfirmModal = () => {
+    setErrorMessage(null);
     setIsOpen(false);
   };
   const handleLogout = async () => {
     setIsLoggingOut(true);
-    await logoutAccount();
-    updateAuth(null, null);
-    setIsOpen(false);
-    router.push('/');
+    setErrorMessage(null);
+    try {
+      await logoutAccount();
+      updateAuth(null, null);
+      setIsOpen(false);
+      router.push('/');
+    } catch {
+      setErrorMessage('Failed to log out. Please try again.');
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return {
@@ -40,5 +50,6 @@ export default function useLogoutButton() {
     handleOpenConfirmModal,
     handleCloseConfirmModal,
     isLoggingOut,
+    errorMessage,
   };
 }

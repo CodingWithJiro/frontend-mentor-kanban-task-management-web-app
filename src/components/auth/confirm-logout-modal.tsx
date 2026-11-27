@@ -6,6 +6,7 @@ interface ConfirmLogoutModalProps {
   onLogout: () => void;
   onCancel: () => void;
   isLoggingOut: boolean;
+  errorMessage: string | null;
 }
 
 export default function ConfirmLogoutModal({
@@ -13,6 +14,7 @@ export default function ConfirmLogoutModal({
   onLogout,
   onCancel,
   isLoggingOut,
+  errorMessage,
 }: ConfirmLogoutModalProps) {
   const user = useAuthStore((state) => state.user);
 
@@ -27,7 +29,13 @@ export default function ConfirmLogoutModal({
         Are you sure you want to log out
         <span className="text-main-purple">{` @${user?.username}`}</span>?
       </p>
-      <div className="flex flex-col items-center justify-center gap-4">
+      <div className="relative flex flex-col items-center justify-center gap-4">
+        {errorMessage && (
+          <p className="text-red text-body-m absolute -top-4.5 left-2 w-full">
+            {errorMessage}
+          </p>
+        )}
+
         <button
           className={`text-body-l ${
             isLoggingOut
@@ -45,6 +53,7 @@ export default function ConfirmLogoutModal({
           className="text-body-l text-main-purple bg-background-button-secondary hover:bg-background-button-secondary-hover focus-visible:outline-main-purple w-full cursor-pointer rounded-[20px] px-4 py-2 font-bold outline-offset-4 outline-transparent transition-colors focus-visible:outline-2"
           type="button"
           onClick={onCancel}
+          disabled={isLoggingOut}
         >
           Cancel
         </button>
